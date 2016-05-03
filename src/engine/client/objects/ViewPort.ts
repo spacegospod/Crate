@@ -85,8 +85,8 @@ namespace Crate {
 
         private getCenter():Point {
             if (typeof this.object !== 'undefined') {
-                // todo: use copy
-                this.position = new Point(this.object.position.x,
+                this.position = new Point(
+                    this.object.position.x,
                     this.object.position.y);
             }
 

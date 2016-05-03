@@ -53,11 +53,10 @@ namespace Crate {
                         continue;
                     }
 
-                    var p = this.viewPort.translateInViewport(new Point(object.position.x - image.width / 2,
-                        object.position.y - image.height / 2));
+                    var p = this.viewPort.translateInViewport(new Point(object.position.x, object.position.y));
 
                     if (object.rotation == 0) {
-                        this.context.drawImage(image, p.x, p.y);
+                        this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
                     } else {
                         this.drawRotated(image, p.x, p.y, object.rotation);
                     }
@@ -69,14 +68,13 @@ namespace Crate {
             // save the current co-ordinate system 
             this.context.save(); 
             // move to the middle of where we want to draw our image
-            this.context.translate(x + (image.width / 2),
-                y + (image.height / 2));
+            this.context.translate(x, y);
             // rotate around that point, converting our 
             // angle from degrees to radians 
             this.context.rotate(VU.toRadians(rotation));
             // draw it up and to the left by half the width
             // and height of the image 
-            this.context.drawImage(image, -(image.width / 2), -(image.height / 2));
+            this.context.drawImage(image, - (image.width / 2), - (image.height / 2));
             this.context.restore(); 
         }
 
