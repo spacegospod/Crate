@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+    <body>
+        <canvas id="canvas" width="800" height="600"/>
+        <script src="sources/engine.js"></script>
+        <script src="sources/index.js"></script>
+        <script>
+            function init() {
+                // get resource maps
+                Promise.all([
+                    getResourcePromise('/meta/image_map.json'),
+                    getResourcePromise('/meta/sound_map.json'),
+                    getResourcePromise('/resources/level.json')])
+                .then(function(resources) {
+                    var canvas = document.getElementById('canvas');
+                    var context = canvas.getContext('2d');
+                    try {
+                        var imageMap = JSON.parse(resources[0]);
+                        var soundMap = JSON.parse(resources[1]);
+                        // requires custom parsing
+                        var levelData = resources[2];
+
+                        loadGame(canvas, context, imageMap, soundMap, levelData);
+                    } catch(e) {
+                        console.error('Error while loading game data: ' + e.message);
+                    }
+                });
+            }
+
+            function getResourcePromise(url) {
+                return new Promise(function(resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open("get", url, true);
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4) {
+                            if (req.status == 200) {
+                                resolve(req.responseText);
+                            } else {
+                                reject('Failed to download resource from: ' + url);
+                            }
+                        }
+                    }
+                    req.send();
+                });
+            }
+
+            // Make sure that html and scripts are loaded before we start the game
+            window.onload = init;
+        </script>
+    </body>
+</html>

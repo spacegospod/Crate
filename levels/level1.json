@@ -1,0 +1,31 @@
+{
+	"mapData": {
+		"width": 16,
+		"height": 16,
+		"textureMap": []
+	},
+	"objectsData": [
+		{
+			"type": "BasicMapObject",
+			"properties": {
+				"imageKey": "crate",
+				"rotation": 63,
+				"position": {
+					"x": 500,
+					"y": 500
+				}
+			}
+		},
+		{
+			"type": "BasicMapObject",
+			"properties": {
+				"imageKey": "crate",
+				"rotation": 30,
+				"position": {
+					"x": 615,
+					"y": 612
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Crate",
+  "version": "0.0.1",
+  "description": "game",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "del": "^2.2.0",
+    "gulp-typescript": "^2.12.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "spacegospod",
+  "license": "ISC"
+}
