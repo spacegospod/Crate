@@ -1,14 +1,14 @@
 namespace Crate {
 
     /*
-        An extension over BasicMapObject which possesses
+        An extension over BasicObject which possesses
         speed and direction properties.
     */
-    export class DynamicMapObject extends BasicMapObject {
+    export class DynamicObject extends BasicObject {
         // The speed at which the object moves at each loop
         speed: number;
         // The movement direction
-        private _direction: Vector;
+        protected _direction: Vector;
 
         constructor(imageKey:string = 'texture-default',
                 position:Point = new Point(0, 0),
@@ -19,7 +19,9 @@ namespace Crate {
                 speed = 0) {
             super(imageKey, position, rotation, zIndex, collidable);
             this.speed = speed;
-            this.direction = (direction === undefined) ? new Vector(0, 0) : direction;
+            this.direction = (direction === undefined)
+                    ? new Vector(0, 0)
+                    : new Vector(direction.x, direction.y);
         }
 
         set direction(value) {

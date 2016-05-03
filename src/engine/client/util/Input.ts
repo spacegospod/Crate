@@ -18,6 +18,10 @@ namespace Crate {
             canvas.addEventListener("mousemove", (e) => {this.onMouseMove(e);});
             canvas.addEventListener("mousedown", (e) => {this.onMouseDown(e);});
             canvas.addEventListener("mouseup", (e) => {this.onMouseUp(e);});
+            // prevent right click
+            canvas.addEventListener("contextmenu", function(ev) {
+                ev.preventDefault();
+            });
         }
 
         getMousePressed() {

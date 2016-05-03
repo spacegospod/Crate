@@ -13,7 +13,7 @@ namespace Crate {
             var result = [];
 
             for (var i in sceneObjects) {
-                var object:DynamicMapObject = sceneObjects[i];
+                var object:DynamicObject = sceneObjects[i];
                 // we have no runtime type check :/
                 if (!object['direction'] || !object['speed']) {
                     continue;
@@ -23,7 +23,7 @@ namespace Crate {
                 var relevantCells = this.getRelevantCells(this.getGridCell(object));
 
                 for (var j in sceneObjects) {
-                    var objectToTest:BasicMapObject = sceneObjects[j];
+                    var objectToTest:BasicObject = sceneObjects[j];
                     if (objectToTest.uid === object.uid) {
                         continue;
                     }
@@ -38,7 +38,7 @@ namespace Crate {
             return result;
         }
 
-        private getGridCell(object:BasicMapObject):Cell {
+        private getGridCell(object:BasicObject):Cell {
             var x = object.position.x;
             var y = object.position.y;
             return new Cell(
@@ -72,10 +72,10 @@ namespace Crate {
     // A group of objects to be tested for collision.
     // Consists of one dynamic object and an array of static ones.
     export class CollisionGroup {
-        dynamicObject: DynamicMapObject
+        dynamicObject: DynamicObject
         targets;
 
-        constructor(dynamicObject:DynamicMapObject, targets = []) {
+        constructor(dynamicObject:DynamicObject, targets = []) {
             this.dynamicObject = dynamicObject;
             this.targets = targets;
         }

@@ -8,7 +8,7 @@ namespace Crate {
         private position: Point;
         // optional object to follow
         // specified via the centerOn method
-        private object: BasicMapObject;
+        private object: BasicObject;
 
         width: number;
         height: number;
@@ -19,7 +19,7 @@ namespace Crate {
             this.height = height;
         }
 
-        centerOn(object:BasicMapObject) {
+        centerOn(object:BasicObject) {
             this.object = object;
         }
 
@@ -32,7 +32,7 @@ namespace Crate {
         // An object is considered to be "in the viewport" when at least
         // one of its bounding box edges lies within. If there is no bounding box
         // the center of the object is used.
-        testObject(object:BasicMapObject):boolean {
+        testObject(object:BasicObject):boolean {
             if (!object.boundingBox) {
                 return this.testPoint(object.position);
             }

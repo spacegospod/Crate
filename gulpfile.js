@@ -11,13 +11,31 @@ gulp.task('clean', function() {
 });
 
 // Builds the Crate engine client and
-// publishes its uglified version to the build directory
+// publishes it to the repository
 gulp.task('engine-client', function() {
     return gulp.src('src/engine/client/**/*.ts')
+        .pipe(concat('engine-client.ts'))
+        .pipe(gulp.dest('repo/'));
+});
+
+// Builds the Crate engine server and
+// publishes its uglified version to the repository
+gulp.task('engine-server', function() {
+    return gulp.src('src/engine/server/**/*.js')
+        .pipe(concat('engine-server.js'))
+        .pipe(gulp.dest('repo/'));
+});
+
+// Builds the Crate game client and
+// publishes its uglified version to the build directory
+gulp.task('game-client', function() {
+    return gulp.src(['repo/engine-client.ts',
+        'src/game/client/**/*.ts',
+        'src/game/Main.ts'])
         .pipe(ts({
             target: 'ES5',
             noImplicitAny: false,
-            out: 'engine.js'
+            out: 'game.js'
         }))
         .pipe(uglify())
         .on('error', function(e) {
@@ -26,22 +44,24 @@ gulp.task('engine-client', function() {
         .pipe(gulp.dest('build/sources/'));
 });
 
-// Builds the Crate engine client in debug mode and
+// Builds the Crate game client in debug mode and
 // publishes it to the build directory
-gulp.task('engine-client-debug', function() {
-    return gulp.src('src/engine/client/**/*.ts')
+gulp.task('game-client-debug', function() {
+    return gulp.src(['repo/engine-client.ts',
+        'src/game/client/**/*.ts',
+        'src/game/Main.ts'])
         .pipe(ts({
             target: 'ES5',
             noImplicitAny: false,
-            out: 'engine.js'
+            out: 'game.js'
         }))
         .pipe(gulp.dest('build/sources/'));
 });
 
-// Builds the Crate engine server and
+// Builds the Crate game server and
 // publishes its uglified version to the build directory
-gulp.task('engine-server', function() {
-    return gulp.src('src/engine/server/**/*.js')
+gulp.task('game-server', function() {
+    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
         .pipe(concat('server.js'))
         .pipe(uglify())
         .on('error', function(e) {
@@ -50,17 +70,17 @@ gulp.task('engine-server', function() {
         .pipe(gulp.dest('build/sources/'));
 });
 
-// Builds the Crate engine server in debug mode and
+// Builds the Crate game server in debug mode and
 // publishes it to the build directory
-gulp.task('engine-server-debug', function() {
-    return gulp.src('src/engine/server/**/*.js')
+gulp.task('game-server-debug', function() {
+    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
         .pipe(concat('server.js'))
         .pipe(gulp.dest('build/sources/'));
 });
 
 // Packages the index files
 gulp.task('index', function() {
-    return gulp.src(['src/index.html', 'src/index.js'])
+    return gulp.src('src/index.html')
         .pipe(gulp.dest('build/sources'));
 });
 
@@ -93,6 +113,8 @@ gulp.task('install',
     [
         'engine-client',
         'engine-server',
+        'game-client',
+        'game-server',
         'resources-images',
         'resources-sounds',
         'meta',
@@ -112,8 +134,10 @@ gulp.task('install',
 // Runs all tasks in debug mode where aplicable and packages the game
 gulp.task('install-debug',
     [
-        'engine-client-debug',
-        'engine-server-debug',
+        'engine-client',
+        'engine-server',
+        'game-client-debug',
+        'game-server-debug',
         'resources-images',
         'resources-sounds',
         'meta',

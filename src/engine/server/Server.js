@@ -13,7 +13,7 @@ function Server(levelName) {
     server.use('/meta', express.static(process.env.CRATE_PATH + '/meta'));
 
     // Host index file under default path
-    server.get("/", function(req, res){
+    server.get("/", function(req, res) {
         fs.readFile(process.env.CRATE_PATH + '/sources/index.html', 'utf8', function(err, data){
             if (!err) {
                 res.send(data);
@@ -24,7 +24,7 @@ function Server(levelName) {
     });
 
     // Host level file
-    server.get("/resources/level.json", function(req, res){
+    server.get("/resources/level.json", function(req, res) {
         fs.readFile(process.env.CRATE_PATH + '/levels/' + levelName + '.json',
             'utf8', function(err, data) {
             if (!err) {
@@ -37,7 +37,7 @@ function Server(levelName) {
 
     // Set up websocket connection and start listening
     var io = require('socket.io').listen(server.listen(PORT, function() {
-        console.log("Listening on port " + PORT);   
+        console.log("Listening on port " + PORT);
     }));
 
     // Exposes the websocket connection endpoint

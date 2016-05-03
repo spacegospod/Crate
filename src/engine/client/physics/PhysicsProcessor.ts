@@ -20,7 +20,7 @@ namespace Crate {
             var groups = this.groupsResolver.getBroadPhaseGroups(scene.objects);
             for (var i in groups) {
                 var group:CollisionGroup = groups[i];
-                var dynamicObject:DynamicMapObject = group.dynamicObject;
+                var dynamicObject:DynamicObject = group.dynamicObject;
                 var targets = group.targets;
 
                 var direction:Vector = VU.normalize(dynamicObject.direction);
@@ -70,7 +70,7 @@ namespace Crate {
         private updateBoundingBoxes(scene:Scene, imageCache:ImageCache) {
             var objects = scene.objects;
             for (var i in objects) {
-                var object:BasicMapObject = objects[i];
+                var object:BasicObject = objects[i];
                 var image = imageCache.getImageByKey(object.imageKey);
                 if (!object.boundingBox && typeof image !== 'undefined') {
                     object.boundingBox = new BoundingBox(

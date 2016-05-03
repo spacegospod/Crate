@@ -3,5 +3,5 @@
 	"bullet": "bullet.png",
 	"crate": "crate.png",
 	"soldier": "soldier.png",
-	"texture-default": "texture.png"
+	"texture-default": "default_texture.png"
 }

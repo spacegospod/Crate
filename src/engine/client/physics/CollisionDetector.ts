@@ -7,8 +7,8 @@ namespace Crate {
 
         // Test two objects for collision
         getCollisionData(
-            testedObject:BasicMapObject,
-            targetObject:BasicMapObject):CollisionData {
+            testedObject:BasicObject,
+            targetObject:BasicObject):CollisionData {
             var box1:BoundingBox = testedObject.boundingBox;
             var box2:BoundingBox = targetObject.boundingBox;
             if (!box1 || !box2) {
@@ -89,10 +89,10 @@ namespace Crate {
         private _axis: Vector;
         private _overlapAmount: number;
 
-        testedObject: BasicMapObject;
-        targetObject: BasicMapObject
+        testedObject: BasicObject;
+        targetObject: BasicObject
 
-        constructor(testedObject:BasicMapObject, targetObject:BasicMapObject,
+        constructor(testedObject:BasicObject, targetObject:BasicObject,
             axis:Vector, overlap:number) {
             this.testedObject = testedObject;
             this.targetObject = targetObject;

@@ -12,10 +12,10 @@ namespace Crate {
         }
 
         // Registers a builder function for a custom object type.
-        // The natively supported types are BasicMapObject and DynamicMapObject
+        // The natively supported types are BasicObject and DynamicObject
         // from the Crate engine.
         registerCustomObject(type:string, builderFunc) {
-            this.customObjectsBuilders[type] = builderFunc;
+            this.customObjectsBuilders[type.toLowerCase()] = builderFunc;
         }
 
         // Accepts a JSON as a string
@@ -65,17 +65,17 @@ namespace Crate {
             function constructor(constructorFunction) {
                 return constructorFunction.apply(this);
             }
-            switch(data.type) {
-                case "BasicMapObject": {
-                    return this.createBasicMapObject(data.properties);
+            switch(data.type.toLowerCase()) {
+                case "basicobject": {
+                    return this.createBasicObject(data.properties);
                 }
-                case "DynamicMapObject": {
-                    return this.createDynamicMapObject(data.properties);
+                case "dynamicobject": {
+                    return this.createDynamicObject(data.properties);
                 }
                 default: {
                     var customBuilder = this.customObjectsBuilders[data.type];
                     if (customBuilder) {
-                        this.buildCustomObject(customBuilder, data.properties);
+                        return this.buildCustomObject(customBuilder, data.properties);
                     } else {
                         throw new Error("Unknown map object type: " + data.type);
                     }
@@ -108,10 +108,10 @@ namespace Crate {
                 try {
                     switch(prop) {
                         case "position": {
-                            object['position'] = new Point(props[prop].x, props[prop].x);
+                            object['position'] = new Point(props[prop].x, props[prop].y);
                         }
                         case "direction": {
-                            object['direction'] = new Vector(props[prop].x, props[prop].x);
+                            object['direction'] = new Vector(props[prop].x, props[prop].y);
                         }
                     }
                 } catch(e) {
@@ -120,22 +120,22 @@ namespace Crate {
             }
         }
 
-        private buildCustomObject(customBuilder, data) {
-            var obj = customBuilder(data);
-            this.loadBasicProperties(obj, data.properties);
-            this.loadComplexProperties(obj, data.properties);
-            return obj;
-        }
-
-        private createBasicMapObject(properties) {
-            var obj = new BasicMapObject();
+        private buildCustomObject(customBuilder, properties) {
+            var obj = customBuilder(properties);
             this.loadBasicProperties(obj, properties);
             this.loadComplexProperties(obj, properties);
             return obj;
         }
 
-        private createDynamicMapObject(properties) {
-            var obj = new DynamicMapObject();
+        private createBasicObject(properties) {
+            var obj = new BasicObject();
+            this.loadBasicProperties(obj, properties);
+            this.loadComplexProperties(obj, properties);
+            return obj;
+        }
+
+        private createDynamicObject(properties) {
+            var obj = new DynamicObject();
             this.loadBasicProperties(obj, properties);
             this.loadComplexProperties(obj, properties);
             return obj;

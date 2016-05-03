@@ -1,9 +1,25 @@
 <!DOCTYPE HTML>
+<head>
+    <style>
+        #container {
+            margin-left: auto;
+            margin-right: auto;
+            width: 800px;
+        }
+
+        #canvas {
+            width: 800px;
+            height: 600px;
+            cursor: url(resources/images/crosshair_green.png), auto;
+        }
+    </style>
+</head>
 <html>
     <body>
-        <canvas id="canvas" width="800" height="600"/>
-        <script src="sources/engine.js"></script>
-        <script src="sources/index.js"></script>
+        <div id="container">
+            <canvas id="canvas" width="800" height="600"/>
+        </div>
+        <script src="sources/game.js"></script>
         <script>
             function init() {
                 // get resource maps
@@ -20,7 +36,7 @@
                         // requires custom parsing
                         var levelData = resources[2];
 
-                        loadGame(canvas, context, imageMap, soundMap, levelData);
+                        Crate.loadGame(canvas, context, imageMap, soundMap, levelData);
                     } catch(e) {
                         console.error('Error while loading game data: ' + e.message);
                     }

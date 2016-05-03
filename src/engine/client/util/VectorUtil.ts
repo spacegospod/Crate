@@ -37,8 +37,14 @@ namespace Crate {
             return new Vector(vector.x /= vectorLength, vector.y /= vectorLength);
         }
 
+        // dot product. duh.
         dotProduct(v1:Vector, v2:Vector) {
             return ((v1.x * v2.x) + (v1.y * v2.y));
+        }
+
+        // Get the sum of 2 vectors
+        sumVectors(v1:Vector, v2:Vector) {
+            return new Vector(v1.x + v2.x, v1.y + v2.y);
         }
 
         // Calculates the angle between two vectors

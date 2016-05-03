@@ -6,7 +6,7 @@
 	},
 	"objectsData": [
 		{
-			"type": "BasicMapObject",
+			"type": "BasicObject",
 			"properties": {
 				"imageKey": "crate",
 				"rotation": 63,
@@ -17,13 +17,33 @@
 			}
 		},
 		{
-			"type": "BasicMapObject",
+			"type": "BasicObject",
 			"properties": {
 				"imageKey": "crate",
 				"rotation": 30,
 				"position": {
 					"x": 615,
 					"y": 612
+				}
+			}
+		},
+		{
+			"type": "soldier",
+			"properties": {
+				"rotation": 173,
+				"position": {
+					"x": 766,
+					"y": 130
+				}
+			}
+		},
+		{
+			"type": "soldier",
+			"properties": {
+				"rotation": 222,
+				"position": {
+					"x": 766,
+					"y": 555
 				}
 			}
 		}
