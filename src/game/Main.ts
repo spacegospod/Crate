@@ -61,7 +61,7 @@ namespace Crate {
         player.rotation = directionVector.x > 0 ? 360 - angle : angle;
     }
 
-    export function loadGame(canvas, context, imageMap, soundMap, levelData) {
+    export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData) {
         _canvas = canvas;
         game = new Crate.Game(canvas);
         var levelParser = new Crate.LevelParser();
@@ -71,7 +71,7 @@ namespace Crate {
         var level = levelParser.parse(levelData);
 
         viewPort = new Crate.ViewPort(800, 600);
-        game.init(imageMap, soundMap, context, viewPort, level);
+        game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
         player = new Crate.Soldier(new Crate.Point(300, 700), new Crate.Vector(1, 0));
 

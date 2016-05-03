@@ -5,18 +5,25 @@ namespace Crate {
     */
     export class PhysicsProcessor {
         // The delta timer.
-        private delta:Delta;
-        detector:CollisionDetector;
-        groupsResolver:CollisionGroupsResolver;
+        private delta: Delta;
+        private imageCache: ImageCache;
+        private boundingBoxGenerator: BoundingBoxGenerator
 
-        constructor(delta:Delta) {
+        detector: CollisionDetector;
+        groupsResolver: CollisionGroupsResolver;
+
+        constructor(delta:Delta,
+                imageCache:ImageCache,
+                boundingBoxGenerator:BoundingBoxGenerator) {
             this.delta = delta;
             this.detector = new CollisionDetector();
             this.groupsResolver = new CollisionGroupsResolver();
+            this.imageCache = imageCache;
+            this.boundingBoxGenerator = boundingBoxGenerator;
         }
 
-        processDynamicObjects(scene:Scene, imageCache:ImageCache) {
-            this.updateBoundingBoxes(scene, imageCache);
+        processDynamicObjects(scene:Scene) {
+            this.updateBoundingBoxes(scene, this.imageCache);
             var groups = this.groupsResolver.getBroadPhaseGroups(scene.objects);
             for (var i in groups) {
                 var group:CollisionGroup = groups[i];
@@ -73,11 +80,13 @@ namespace Crate {
                 var object:BasicObject = objects[i];
                 var image = imageCache.getImageByKey(object.imageKey);
                 if (!object.boundingBox && typeof image !== 'undefined') {
-                    object.boundingBox = new BoundingBox(
-                        object.position,
+                    object.boundingBox = this.boundingBoxGenerator.generateBoundingBoxForImage(
+                        object.imageKey,
                         image.width,
                         image.height,
-                        object.rotation);
+                        object.position,
+                        object.rotation
+                        );
                 }
             }
         }

@@ -10,8 +10,7 @@ namespace Crate {
         // Rotation in degrees
         private _rotation: number = 0;
 
-        // The 4 vertices of the box
-        private _vertices;
+        vertices;
 
         constructor(position:Point,
             width:number, height:number,
@@ -19,24 +18,24 @@ namespace Crate {
             this._position = position;
 
             // Create 4 points based on the provided location
-            this._vertices = [];
+            this.vertices = [];
             // top left
-            this._vertices.push(
+            this.vertices.push(
                 new Point(
                     position.x - width / 2,
                     position.y - height / 2));
             // top right
-            this._vertices.push(
+            this.vertices.push(
                 new Point(
                     position.x + width / 2,
                     position.y - height / 2));
             // bottom right
-            this._vertices.push(
+            this.vertices.push(
                 new Point(
                     position.x + width / 2,
                     position.y + height / 2));
             // bottom left
-            this._vertices.push(
+            this.vertices.push(
                 new Point(
                     position.x - width / 2,
                     position.y + height / 2));
@@ -54,8 +53,8 @@ namespace Crate {
             var xOffset = value.x - this._position.x;
             var yOffset = value.y - this._position.y;
 
-            for (var i in this._vertices) {
-                var point:Point = this._vertices[i];
+            for (var i in this.vertices) {
+                var point:Point = this.vertices[i];
                 point.x += xOffset;
                 point.y += yOffset;
             }
@@ -73,8 +72,8 @@ namespace Crate {
             var sin = Math.sin(VU.toRadians(offset));
             var cos = Math.cos(VU.toRadians(offset));
 
-            for (var i in this._vertices) {
-                var point:Point = this._vertices[i];
+            for (var i in this.vertices) {
+                var point:Point = this.vertices[i];
                 // translate to origin
                 point.x -= this._position.x;
                 point.y -= this._position.y;
@@ -85,10 +84,6 @@ namespace Crate {
                 point.x = newX + this._position.x;
                 point.y = newY + this._position.y;
             }
-        }
-
-        get vertices() {
-            return this._vertices;
         }
     }
 }

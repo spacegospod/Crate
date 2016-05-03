@@ -18,6 +18,7 @@ namespace Crate {
         private renderer: Renderer;
         private audio: AudioManager;
         private imageCache: ImageCache;
+        private boundingBoxGenerator: BoundingBoxGenerator;
         private delta: Delta;
         private viewPort: ViewPort;
         private inputRegistry: Input;
@@ -36,7 +37,6 @@ namespace Crate {
             this.scene = new Scene();
             this.delta = new Delta();
             this.inputRegistry = new Input(canvas);
-            this.physicsProcessor = new PhysicsProcessor(this.delta);
 
             this.preProcessCalls = [];
             this.postProcessCalls = [];
@@ -44,7 +44,7 @@ namespace Crate {
             this.initialized = false;
         }
 
-        init(imageMap, audioMap, context, viewPort:ViewPort, level:Level) {
+        init(imageMap, audioMap, boundingBoxes, context, viewPort:ViewPort, level:Level) {
             if (this.initialized) {
                 return;
             }
@@ -54,6 +54,10 @@ namespace Crate {
             this.viewPort = viewPort;
             this.imageCache = new ImageCache(imageMap);
             this.audio = new AudioManager(audioMap);
+            this.boundingBoxGenerator = new BoundingBoxGenerator(boundingBoxes);
+            this.physicsProcessor = new PhysicsProcessor(this.delta,
+                this.imageCache,
+                this.boundingBoxGenerator);
             this.renderer = new Renderer(context, viewPort, this.scene, level.map, this.imageCache);
 
             for (var i in level.objects) {
@@ -78,7 +82,7 @@ namespace Crate {
 
             this.loopCalls(this.preProcessCalls);
 
-            this.physicsProcessor.processDynamicObjects(this.scene, this.imageCache);
+            this.physicsProcessor.processDynamicObjects(this.scene);
             
             this.renderer.draw();
 

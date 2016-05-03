@@ -7,7 +7,7 @@ const del = require('del');
 
 // Deletes all output directories and files
 gulp.task('clean', function() {
-    return del(['build/', 'publish/']);
+    return del(['build/', 'publish/', 'repo/']);
 });
 
 // Builds the Crate engine client and

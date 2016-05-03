@@ -26,6 +26,7 @@
                 Promise.all([
                     getResourcePromise('/meta/image_map.json'),
                     getResourcePromise('/meta/sound_map.json'),
+                    getResourcePromise('/meta/bounding_boxes.json'),
                     getResourcePromise('/resources/level.json')])
                 .then(function(resources) {
                     var canvas = document.getElementById('canvas');
@@ -33,10 +34,16 @@
                     try {
                         var imageMap = JSON.parse(resources[0]);
                         var soundMap = JSON.parse(resources[1]);
+                        var boundingBoxes = JSON.parse(resources[2]);
                         // requires custom parsing
-                        var levelData = resources[2];
+                        var levelData = resources[3];
 
-                        Crate.loadGame(canvas, context, imageMap, soundMap, levelData);
+                        Crate.loadGame(canvas,
+                                context,
+                                imageMap,
+                                soundMap,
+                                boundingBoxes,
+                                levelData);
                     } catch(e) {
                         console.error('Error while loading game data: ' + e.message);
                     }
