@@ -46,11 +46,13 @@ namespace Crate {
         // Iterates the provided two-dimensional array
         // and applies textures to the corresponding tiles
         applyTextures(textures) {
-            for (var i=0; i < textures.lenth; i++) {
-                var row = textures[row];
-                for (var j=0; j < row.length; j++) {
-                    var textureId = row[j];
-                    this.getTileByIndex(i, j).textureKey = textureId;
+            for (var i = 0; i < textures.length; i++) {
+                var row = textures[i];
+                for (var j = 0; j < row.length; j++) {
+                    var tile = this.getTileByIndex(j, i);
+                    if (typeof tile !== 'undefined') {
+                        tile.textureIndex = new Point(row[j].x, row[j].y);
+                    }
                 }
             }
         }

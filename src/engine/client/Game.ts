@@ -60,6 +60,8 @@ namespace Crate {
                 this.boundingBoxGenerator);
             this.renderer = new Renderer(context, viewPort, this.scene, level.map, this.imageCache);
 
+            this.viewPort.detector = this.physicsProcessor.detector;
+
             for (var i in level.objects) {
                 this.scene.add(level.objects[i]);
             }

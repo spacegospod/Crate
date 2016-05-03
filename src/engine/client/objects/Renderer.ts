@@ -85,13 +85,21 @@ namespace Crate {
                 for (var col=0; col < this.level.columns; col++) {
                     if (this.testTile(row, col)) {
                         var tile = this.level.getTileByIndex(row, col);
-                        var texture = this.imageCache.getImageByKey(tile.textureKey);
-                        if (typeof texture === 'undefined') {
-                            console.error('Failed to render image for key: ' + tile.textureKey);
-                        }
-                        var location = this.viewPort.translateInViewport(new Point(row * Tile.TILE_WIDTH,
+                        var sprite = this.imageCache.getImageByKey("texture-sprite");
+                        var location = this.viewPort.translateInViewport(
+                            new Point(
+                                row * Tile.TILE_WIDTH,
                                 col * Tile.TILE_HEIGHT));
-                        this.context.drawImage(texture, location.x, location.y);
+                        this.context.drawImage(
+                            sprite,
+                            tile.textureIndex.x * Tile.TILE_WIDTH,
+                            tile.textureIndex.y * Tile.TILE_HEIGHT,
+                            Tile.TILE_WIDTH,
+                            Tile.TILE_HEIGHT,
+                            location.x,
+                            location.y,
+                            Tile.TILE_WIDTH,
+                            Tile.TILE_HEIGHT);
                     }
                 }
             }

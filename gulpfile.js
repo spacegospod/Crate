@@ -1,9 +1,10 @@
-const gulp = require('gulp');
-const concat = require('gulp-concat');
-const ts = require('gulp-typescript');
-const uglify = require('gulp-uglify');
-const zip = require('gulp-zip');
-const del = require('del');
+const gulp = require('gulp'),
+    concat = require('gulp-concat'),
+    ts = require('gulp-typescript'),
+    uglify = require('gulp-uglify'),
+    jsonMinify = require('gulp-json-minify'),
+    zip = require('gulp-zip'),
+    del = require('del');
 
 // Deletes all output directories and files
 gulp.task('clean', function() {
@@ -99,12 +100,14 @@ gulp.task('resources-sounds', function() {
 // Packages game and engine metadata
 gulp.task('meta', function() {
     return gulp.src('meta/**/*.json')
+        .pipe(jsonMinify())
         .pipe(gulp.dest('build/meta/'));
 });
 
 // Packages levels
 gulp.task('levels', function() {
     return gulp.src('levels/**/*.json')
+        .pipe(jsonMinify())
         .pipe(gulp.dest('build/levels/'));
 });
 

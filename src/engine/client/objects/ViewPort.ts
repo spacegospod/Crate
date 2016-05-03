@@ -5,10 +5,17 @@ namespace Crate {
         Contains methods for testing whether objects lie within and should be drawn.
     */
     export class ViewPort {
+        // A phony map object which enables the viewport
+        // to use the CollisionDetector's advanced validations
+        private mockObject: BasicObject
+        // position of the viewport on the map
         private position: Point;
         // optional object to follow
         // specified via the centerOn method
         private object: BasicObject;
+
+        // Used for testing objects
+        detector: CollisionDetector;
 
         width: number;
         height: number;
@@ -17,6 +24,13 @@ namespace Crate {
             this.position = new Point(0, 0);
             this.width = width;
             this.height = height;
+
+            this.mockObject = new BasicObject();
+            this.mockObject.boundingBox = new BoundingBox(
+                        this.position,
+                        width,
+                        height,
+                        0);
         }
 
         centerOn(object:BasicObject) {
@@ -36,7 +50,15 @@ namespace Crate {
             if (!object.boundingBox) {
                 return this.testPoint(object.position);
             }
+
+            if (typeof this.detector !== 'undefined') {
+                this.mockObject.position = this.position;
+                return this.detector.getCollisionData(
+                    this.mockObject,
+                    object) !== undefined;
+            }
             
+            // fall back to this workaround if there is no collision detector provided
             var self = this;
             return object.boundingBox.vertices.some(function(vertice) {
                 return self.testPoint(vertice);

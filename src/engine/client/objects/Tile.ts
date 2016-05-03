@@ -1,14 +1,14 @@
 namespace Crate {
 
     export class Tile {
-        static TILE_WIDTH: number = 64;
-        static TILE_HEIGHT: number = 64;
-        static DEFAULT_TEXTURE: string = 'texture-default';
+        static TILE_WIDTH: number = 32;
+        static TILE_HEIGHT: number = 32;
 
-        textureKey:string;
+        // The position of the texture tile on the sprite
+        textureIndex: Point;
 
-        constructor(textureKey=Tile.DEFAULT_TEXTURE) {
-            this.textureKey = textureKey;
+        constructor(index=new Point(0, 0)) {
+            this.textureIndex = new Point(index.x, index.y);
         }
     }
 }
