@@ -22,7 +22,7 @@ namespace Crate {
                 var p1:Projection = this.project(box1.vertices, axis);
                 var p2:Projection = this.project(box2.vertices, axis);
                 var centerProjection:Projection =
-                    this.project([targetObject.position, testedObject.position], axis);
+                    this.project([box1.center, box2.center], axis);
                 var overlap = this.overlap(centerProjection, p1, p2);
                 if (overlap == 0) {
                     return undefined;

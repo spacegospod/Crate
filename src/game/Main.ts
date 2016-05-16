@@ -61,6 +61,10 @@ namespace Crate {
         player.rotation = directionVector.x > 0 ? 360 - angle : angle;
     }
 
+    function clickHandler(event) {
+        console.log('click');
+    }
+
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData) {
         _canvas = canvas;
         game = new Crate.Game(canvas);
@@ -77,6 +81,8 @@ namespace Crate {
 
         game.scene.add(player);
         viewPort.centerOn(player);
+
+        game.inputRegistry.attachCustomListener(true, 'click', clickHandler);
 
         game.begin([userInputCallback], []);
     }

@@ -6,7 +6,7 @@ namespace Crate {
     export class CollisionGroupsResolver {
         // Should be enough to contain the largest possible object in a game
         // in order for this component to provide acurate results
-        private CELL_SIZE: number = 256;
+        private CELL_SIZE: number = 128;
 
         // Extracts groups of objects which need to be tested
         getBroadPhaseGroups(sceneObjects) {
@@ -15,7 +15,7 @@ namespace Crate {
             for (var i in sceneObjects) {
                 var object:DynamicObject = sceneObjects[i];
                 // we have no runtime type check :/
-                if (!object['direction'] || !object['speed']) {
+                if (object['direction'] === undefined || object['speed'] === undefined) {
                     continue;
                 }
 

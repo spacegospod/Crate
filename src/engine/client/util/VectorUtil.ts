@@ -26,6 +26,24 @@ namespace Crate {
             return rotatedVector;
         }
 
+        rotatePoint(point:Point, fulcrum:Point, amount:number):Point {
+            var result:Point = new Point(point.x, point.y);
+            var sin = Math.sin(VU.toRadians(amount));
+            var cos = Math.cos(VU.toRadians(amount));
+
+            // translate to origin
+            result.x -= fulcrum.x;
+            result.y -= fulcrum.y;
+            // rotate
+            var newX = result.x * cos - result.y * sin;
+            var newY = result.x * sin + result.y * cos;
+            // translate back
+            result.x = newX + fulcrum.x;
+            result.y = newY + fulcrum.y;
+
+            return result;
+        }
+
         // Calculates the length of the provided vector
         length(vector:Vector) {
             return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2));

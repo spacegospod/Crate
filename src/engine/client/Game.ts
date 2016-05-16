@@ -21,7 +21,6 @@ namespace Crate {
         private boundingBoxGenerator: BoundingBoxGenerator;
         private delta: Delta;
         private viewPort: ViewPort;
-        private inputRegistry: Input;
         private physicsProcessor: PhysicsProcessor;
 
         // Custom callbacks executed before built-in game logic
@@ -31,6 +30,7 @@ namespace Crate {
 
         private initialized: boolean;
 
+        inputRegistry: Input;
         scene: Scene;
 
         constructor(canvas) {

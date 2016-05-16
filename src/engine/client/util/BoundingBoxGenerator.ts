@@ -15,14 +15,14 @@ namespace Crate {
                 height:number,
                 position:Point,
                 rotation:number):BoundingBox {
-            var boundingBox:BoundingBox = new BoundingBox(
+            var box:BoundingBox = new BoundingBox(
                         position,
                         width,
                         height,
                         0);
             var spec = this.boundingBoxSpecs[imageKey];
             if (typeof spec !== 'undefined') {
-                var vertices = boundingBox.vertices;
+                var vertices = box.vertices;
 
                 // top left
                 vertices[0].y = position.y - spec.top;
@@ -36,10 +36,14 @@ namespace Crate {
                 // bottom left
                 vertices[3].y = position.y + spec.bottom;
                 vertices[3].x = position.x - spec.left;
+
+                box.centerOffset = new Vector(
+                    ((vertices[1].x + vertices[0].x) / 2) - position.x,
+                    ((vertices[3].y + vertices[0].y) / 2) - position.y);
             }
 
-            boundingBox.rotation = rotation;
-            return boundingBox;
+            box.rotation = rotation;
+            return box;
         }
 
         private populateSpecs(map) {

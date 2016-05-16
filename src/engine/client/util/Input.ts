@@ -4,11 +4,14 @@ namespace Crate {
         A state tracker for user input
     */
     export class Input {
+        private canvas;
+
         private keysPressed;
         private mousePressed: boolean;
         private mousePosition: Point;
 
         constructor(canvas) {
+            this.canvas = canvas;
             this.keysPressed = {};
             this.mousePressed = false;
             this.mousePosition = new Point(0, 0);
@@ -22,6 +25,11 @@ namespace Crate {
             canvas.addEventListener("contextmenu", function(ev) {
                 ev.preventDefault();
             });
+        }
+
+        attachCustomListener(canvasOnly:boolean, type:string, listener) {
+            var target = canvasOnly ? this.canvas : document;
+            target.addEventListener(type, (e) => {listener(e);});
         }
 
         getMousePressed() {

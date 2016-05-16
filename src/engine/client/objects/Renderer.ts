@@ -60,6 +60,35 @@ namespace Crate {
                     } else {
                         this.drawRotated(image, p.x, p.y, object.rotation);
                     }
+
+                    if (object.boundingBox !== undefined) {
+                        var a = object.boundingBox.vertices;
+                        var v = [];
+                        for (var i in a) {
+                            v.push(this.viewPort.translateInViewport(a[i]));
+                        }
+                        this.context.strokeStyle = "#33ff33";
+
+                        this.context.beginPath();
+                        this.context.moveTo(v[0].x, v[0].y);
+                        this.context.lineTo(v[1].x, v[1].y);
+                        this.context.stroke();
+
+                        this.context.beginPath();
+                        this.context.moveTo(v[1].x, v[1].y);
+                        this.context.lineTo(v[2].x, v[2].y);
+                        this.context.stroke();
+
+                        this.context.beginPath();
+                        this.context.moveTo(v[2].x, v[2].y);
+                        this.context.lineTo(v[3].x, v[3].y);
+                        this.context.stroke();
+
+                        this.context.beginPath();
+                        this.context.moveTo(v[3].x, v[3].y);
+                        this.context.lineTo(v[0].x, v[0].y);
+                        this.context.stroke();
+                    }
                 }
             }
         }

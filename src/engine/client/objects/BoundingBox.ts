@@ -10,6 +10,9 @@ namespace Crate {
         // Rotation in degrees
         private _rotation: number = 0;
 
+        // Offset from the position
+        centerOffset: Vector = new Vector(0, 0);
+
         vertices;
 
         constructor(position:Point,
@@ -39,7 +42,6 @@ namespace Crate {
                 new Point(
                     position.x - width / 2,
                     position.y + height / 2));
-
 
             this.rotation = rotation;
         }
@@ -73,17 +75,15 @@ namespace Crate {
             var cos = Math.cos(VU.toRadians(offset));
 
             for (var i in this.vertices) {
-                var point:Point = this.vertices[i];
-                // translate to origin
-                point.x -= this._position.x;
-                point.y -= this._position.y;
-                // rotate
-                var newX = point.x * cos - point.y * sin;
-                var newY = point.x * sin + point.y * cos;
-                // translate back
-                point.x = newX + this._position.x;
-                point.y = newY + this._position.y;
+                this.vertices[i] = VU.rotatePoint(this.vertices[i], this._position, offset);
             }
+        }
+
+        get center():Point {
+            var center:Point = new Point(
+                this._position.x + this.centerOffset.x,
+                this._position.y + this.centerOffset.y);
+            return VU.rotatePoint(center, this._position, this._rotation);
         }
     }
 }
