@@ -45,14 +45,3 @@ function Server(levelName) {
         return io;
     };
 }
-
-if (process.argv.length < 3) {
-    throw new Error("No level specified");
-} else if (typeof process.env.CRATE_PATH === 'undefined') {
-    throw new Error("CRATE_PATH not specified! Set the CRATE_PATH environment variable to the deployment directory.");
-} else {
-    var level = process.argv[2];
-    var Crate = new Server(level);
-
-    module.exports = Crate;
-}

@@ -65,5 +65,10 @@ namespace Crate {
         get object():BasicObject {
             return this._object;
         }
+
+        get ttl() {
+            var lifetime = Date.now() - this._timestamp;
+            return 15 * 1000 - lifetime;
+        }
     }
 }

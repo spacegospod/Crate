@@ -7,9 +7,9 @@ namespace Crate {
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
 
-    export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData) {
+    export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
-        game = new Game(canvas);
+        game = new Game(canvas, io);
         var levelParser = new LevelParser();
         levelParser.registerCustomObject('Soldier', function(data) {
             return new Soldier();
@@ -35,9 +35,14 @@ namespace Crate {
         // for each projectile
         for (var i in projectiles) {
             var projectile:Projectile = projectiles[i];
-            // test against each collidable object
-            processProjectile(projectile, environment);
-            projectile.update();
+            if (projectile.ttl <= 0) {
+                projectiles.splice(projectiles.indexOf(projectile), 1);
+                game.scene.remove(projectile.object);
+            } else {
+                // test against each collidable object
+                processProjectile(projectile, environment);
+                projectile.update();
+            }
         }
     }
 

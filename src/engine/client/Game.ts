@@ -30,13 +30,18 @@ namespace Crate {
 
         private initialized: boolean;
 
-        inputRegistry: Input;
-        scene: Scene;
+        private _inputRegistry: Input;
+        private _scene: Scene;
 
-        constructor(canvas) {
-            this.scene = new Scene();
+        private _socketio;
+        private _connectionMonitor: ConnectionMonitor;
+
+        constructor(canvas, io) {
+            this._scene = new Scene();
             this.delta = new Delta();
-            this.inputRegistry = new Input(canvas);
+            this._inputRegistry = new Input(canvas);
+            this._socketio = io;
+            this._connectionMonitor = new ConnectionMonitor(this._socketio);
 
             this.preProcessCalls = [];
             this.postProcessCalls = [];
@@ -59,12 +64,12 @@ namespace Crate {
                 this.imageCache,
                 this.boundingBoxGenerator);
             this.intersectionDetector = new IntersectionDetector();
-            this.renderer = new Renderer(context, viewPort, this.scene, level.map, this.imageCache);
+            this.renderer = new Renderer(context, viewPort, this._scene, level.map, this.imageCache);
 
             this.viewPort.detector = this.physicsProcessor.detector;
 
             for (var i in level.objects) {
-                this.scene.add(level.objects[i]);
+                this._scene.add(level.objects[i]);
             }
 
             this.initialized = true;
@@ -86,12 +91,34 @@ namespace Crate {
             }
         }
 
+        attachNetworkHandler(eventId:string, callback) {
+            this._socketio.on(eventId, function(data) {
+                callback(data);
+            });
+        }
+
+        removeNetworkHandler(eventId:string, callback) {
+            this._socketio.removeListener(eventId, callback);
+        }
+
+        get inputRegistry(): Input {
+            return this._inputRegistry;
+        }
+
+        get scene(): Scene {
+            return this._scene;
+        }
+
+        get serverTimeOffset() {
+            return this._connectionMonitor.serverTimeOffset;
+        }
+
         private loop() {
             this.delta.update(Date.now());
 
             this.loopCalls(this.preProcessCalls);
 
-            this.physicsProcessor.processDynamicObjects(this.scene);
+            this.physicsProcessor.processDynamicObjects(this._scene);
             
             this.renderer.draw();
 
@@ -104,10 +131,10 @@ namespace Crate {
             for (var i in callbacks) {
                 callbacks[i]({
                     viewport: this.viewPort,
-                    input: this.inputRegistry,
+                    input: this._inputRegistry,
                     delta: this.delta,
                     audio: this.audio,
-                    scene: this.scene,
+                    scene: this._scene,
                     collision: {
                         sat: this.physicsProcessor.detector,
                         line: this.intersectionDetector

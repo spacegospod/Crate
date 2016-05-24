@@ -19,6 +19,7 @@
         <div id="container">
             <canvas id="canvas" width="800" height="600"/>
         </div>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="sources/game.js"></script>
         <script>
             function init() {
@@ -43,7 +44,8 @@
                                 imageMap,
                                 soundMap,
                                 boundingBoxes,
-                                levelData);
+                                levelData,
+                                io.connect());
                     } catch(e) {
                         console.error('Error while loading game data: ' + (e || e.message));
                     }
