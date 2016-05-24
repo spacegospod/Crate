@@ -38,6 +38,9 @@ namespace Crate {
                     dynamicObject.position.x + motionVector.x,
                     dynamicObject.position.y + motionVector.y);
                 for (var j = 0; j < targets.length; j++) {
+                    if (!dynamicObject.collidable || !targets[j].collidable) {
+                        continue;
+                    }
                     var data:CollisionData = this.detector.getCollisionData(
                         dynamicObject, targets[j]);
                     if (data) {

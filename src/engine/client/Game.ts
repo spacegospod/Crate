@@ -13,7 +13,6 @@ namespace Crate {
         should be passed as arguments to this method.
     */
     export class Game {
-
         // Game components. See class documentation for details
         private renderer: Renderer;
         private audio: AudioManager;
@@ -22,6 +21,7 @@ namespace Crate {
         private delta: Delta;
         private viewPort: ViewPort;
         private physicsProcessor: PhysicsProcessor;
+        private intersectionDetector: IntersectionDetector;
 
         // Custom callbacks executed before built-in game logic
         private preProcessCalls;
@@ -58,6 +58,7 @@ namespace Crate {
             this.physicsProcessor = new PhysicsProcessor(this.delta,
                 this.imageCache,
                 this.boundingBoxGenerator);
+            this.intersectionDetector = new IntersectionDetector();
             this.renderer = new Renderer(context, viewPort, this.scene, level.map, this.imageCache);
 
             this.viewPort.detector = this.physicsProcessor.detector;
@@ -77,6 +78,12 @@ namespace Crate {
             this.preProcessCalls = preProcessCalls;
             this.postProcessCalls = postProcessCalls;
             this.loop();
+        }
+
+        triggerEvent(type, data) {
+            if (type == EVENTS.AUDIO) {
+                this.audio.play(data.soundId);
+            }
         }
 
         private loop() {
@@ -100,7 +107,11 @@ namespace Crate {
                     input: this.inputRegistry,
                     delta: this.delta,
                     audio: this.audio,
-                    scene: this.scene
+                    scene: this.scene,
+                    collision: {
+                        sat: this.physicsProcessor.detector,
+                        line: this.intersectionDetector
+                    }
                 });
             }
         }
@@ -122,5 +133,9 @@ namespace Crate {
                 throw new Error('No audio map found');
             }
         }
+    }
+
+    export enum EVENTS {
+        AUDIO
     }
 }

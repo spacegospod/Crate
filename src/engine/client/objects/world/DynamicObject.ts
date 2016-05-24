@@ -1,3 +1,4 @@
+///<reference path='BasicObject.ts' />
 namespace Crate {
 
     /*

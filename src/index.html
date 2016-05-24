@@ -45,8 +45,11 @@
                                 boundingBoxes,
                                 levelData);
                     } catch(e) {
-                        console.error('Error while loading game data: ' + e.message);
+                        console.error('Error while loading game data: ' + (e || e.message));
                     }
+                })
+                .catch(function(error) {
+                    console.error(error.message);
                 });
             }
 

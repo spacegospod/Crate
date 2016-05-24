@@ -60,7 +60,8 @@ namespace Crate {
                     } else {
                         this.drawRotated(image, p.x, p.y, object.rotation);
                     }
-
+                    /*
+                    UNCOMMENT TO DRAW BOUNDING BOXES
                     if (object.boundingBox !== undefined) {
                         var a = object.boundingBox.vertices;
                         var v = [];
@@ -89,6 +90,7 @@ namespace Crate {
                         this.context.lineTo(v[0].x, v[0].y);
                         this.context.stroke();
                     }
+                    */
                 }
             }
         }

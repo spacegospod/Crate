@@ -104,7 +104,6 @@ namespace Crate {
                 if (typeof props[prop] != 'object') {
                     continue;
                 }
-                // hasOwnProperty doesn't work for accessors
                 try {
                     switch(prop) {
                         case "position": {

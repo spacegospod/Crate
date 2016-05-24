@@ -5,17 +5,17 @@ namespace Crate {
     */
     class VectorUtil {
         // Translates an angle into radians
-        toRadians(angle:number) {
+        toRadians(angle:number):number {
             return angle * (Math.PI / 180);
         }
 
         // Translates radians to degrees
-        toAngle(rad:number) {
+        toAngle(rad:number):number {
             return rad * (180 / Math.PI);
         }
 
         // Creates and rotates a new vector from the provided one
-        rotateVector(vector:Vector, angle:number) {
+        rotateVector(vector:Vector, angle:number):Vector {
             var rad:number = this.toRadians(angle);
             // fixed to 10 digits after the floating point
             var sin:number = parseFloat(Number(Math.sin(rad)).toFixed(10));
@@ -45,28 +45,28 @@ namespace Crate {
         }
 
         // Calculates the length of the provided vector
-        length(vector:Vector) {
+        length(vector:Vector):number {
             return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2));
         }
 
         // Returns a normalized version of the provided vector
-        normalize(vector:Vector) {
+        normalize(vector:Vector):Vector {
             var vectorLength = this.length(vector)
             return new Vector(vector.x /= vectorLength, vector.y /= vectorLength);
         }
 
         // dot product. duh.
-        dotProduct(v1:Vector, v2:Vector) {
+        dotProduct(v1:Vector, v2:Vector):number {
             return ((v1.x * v2.x) + (v1.y * v2.y));
         }
 
         // Get the sum of 2 vectors
-        sumVectors(v1:Vector, v2:Vector) {
+        sumVectors(v1:Vector, v2:Vector):Vector {
             return new Vector(v1.x + v2.x, v1.y + v2.y);
         }
 
         // Calculates the angle between two vectors
-        findAngle(v1:Vector, v2:Vector) {
+        findAngle(v1:Vector, v2:Vector):number {
             var cos = this.dotProduct(v1, v2) / (this.length(v1) * this.length(v2));
             return this.toAngle(Math.acos(cos));
         }

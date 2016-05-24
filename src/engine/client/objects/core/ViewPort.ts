@@ -21,6 +21,9 @@ namespace Crate {
         height: number;
 
         constructor(width:number, height:number) {
+            if (width < 0 || height < 0) {
+                throw 'Viewport cannot have negative dimensions';
+            }
             this.position = new Point(0, 0);
             this.width = width;
             this.height = height;
