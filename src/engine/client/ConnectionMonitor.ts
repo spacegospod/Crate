@@ -9,7 +9,7 @@ namespace Crate {
         // The websocket endpoint.
         private _io;
 
-        private _serverTimeOffset = 0;
+        private _serverTimeOffset: number = 0;
 
         private static REQUEST_TIMEOUT = 1 * 1000;
 
@@ -19,7 +19,7 @@ namespace Crate {
             setTimeout(()=>{this.requestServerTime()}, ConnectionMonitor.REQUEST_TIMEOUT);
         }
 
-        get serverTimeOffset() {
+        get serverTimeOffset(): number {
             return this._serverTimeOffset;
         }
 
@@ -35,8 +35,6 @@ namespace Crate {
             this._latencies = this._latencies.slice(0, 29);
             var serverTime = data.serverTime + this.getMeanLatency();
             this._serverTimeOffset = now - serverTime;
-
-            console.log(this._serverTimeOffset);
         }
 
         private getMeanLatency() {

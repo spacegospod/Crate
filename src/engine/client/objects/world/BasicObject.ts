@@ -16,6 +16,8 @@ namespace Crate {
         // The bounding box is initialized if necessary during collision evaluation
         boundingBox: BoundingBox;
 
+        networkUid: string;
+
         // The rotaton in degrees. Used for drawing the image
         private _rotation: number;
         // The key of the image for this object
@@ -38,6 +40,7 @@ namespace Crate {
 
             // generate uid
             this._uid = this.generateUid();
+            this.networkUid = this.generateUid();
         }
 
         // property imageKey
@@ -84,7 +87,7 @@ namespace Crate {
         }
 
         get uid() {
-            return this._uid.valueOf();
+            return this._uid;
         }
 
         // Generates a mostly unique identifier

@@ -7,6 +7,11 @@ namespace Crate {
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
 
+    // All projectiles fired during the current frame
+    var firedProjectiles:Projectile[] = [];
+
+    var networkPayloadBuilder: NetworkPayloadBuilder = new NetworkPayloadBuilder();
+
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
         game = new Game(canvas, io);
@@ -26,7 +31,9 @@ namespace Crate {
 
         game.inputRegistry.attachCustomListener(true, 'click', clickHandler);
 
-        game.begin([userInputCallback, processProjectiles], []);
+        game.attachNetworkHandler('serverpush', onServerPush);
+
+        game.begin([userInputCallback, processProjectiles], [sendClientState, clearFrameState]);
     }
 
     /*------ Game loop callbacks ------*/
@@ -63,6 +70,10 @@ namespace Crate {
             }
         }
         projectile.object.position = position;
+    }
+
+    function clearFrameState() {
+        firedProjectiles = [];
     }
 
     /*------ Input handlers ------*/
@@ -122,7 +133,87 @@ namespace Crate {
     }
 
     function clickHandler(event) {
-        var bullet:Projectile = fireProjectile(player);
+        try {
+            fireBullet((<Soldier>player.object).projectileOrigin, (<Soldier>player.object).projectileDirection);
+        } catch(e) {
+            // player is not a soldier, can't fire
+            return undefined;
+        }
+    }
+
+    /*------ Network functions ------*/
+    function sendClientState() {
+        try {
+            game.emitNetworkData('clientUpdate',
+                networkPayloadBuilder.build(player, firedProjectiles, game.serverTimeOffset))
+        } catch(e) {
+            console.error(e || e.message);
+        }
+    }
+
+    function onServerPush(data) {
+        for (let i in data.objects) {
+            updateObject(data.objects[i]);
+        }
+        for (let i in data.projectiles) {
+            var proj = data.projectiles[i];
+            var bullet = new Projectile(
+                new Point(proj.origin.x, proj.origin.y),
+                new Vector(proj.direction.x, proj.direction.y),
+                <number>proj.speed,
+                createObject(proj.object),
+                <number>proj.timestamp)
+            projectiles.push(bullet);
+            game.scene.add(bullet.object);
+            game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
+        }
+    }
+
+    function updateObject(data) {
+        for (var i in game.scene.objects) {
+            var object = game.scene.objects[i];
+            if (object.networkUid != data.networkUid) {
+                continue;
+            }
+
+            if (!(data.networkUid == player.object.networkUid)) {
+                updateProperties(object, data);
+            }
+            return;
+        }
+
+        // object not found, create
+        var newobj = createObject(data);
+        if (typeof newobj !== 'undefined') {
+            game.scene.add(newobj);
+        }
+    }
+
+    function updateProperties(object:BasicObject, props) {
+        if (typeof props.position !== 'undefined') {
+            object.position = props.position;
+        }
+        if (typeof props.rotation !== 'undefined') {
+            object.rotation = props.rotation;
+        }
+        if (typeof props.collidable !== 'undefined') {
+            object.collidable = props.collidable;
+        }
+        if (props.imageKey && props.imageKey != object.imageKey) {
+            object.imageKey = props.imageKey;
+        }
+    }
+
+    function createObject(data):BasicObject {
+        var newObject:BasicObject = new BasicObject();
+        newObject.networkUid = data.networkUid;
+        updateProperties(newObject, data);
+        return newObject;
+    }
+
+    /*------ Misc functions ------*/
+    function fireBullet(origin:Point, direction:Vector) {
+        var bullet:Projectile = new Bullet(origin, direction)
         if (typeof bullet === 'undefined') {
             return;
         }
@@ -130,21 +221,6 @@ namespace Crate {
         game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
 
         projectiles.push(bullet);
-    }
-
-    /*------ misc functions ------*/
-
-    // Creates a projectile originating from the provided player.
-    function fireProjectile(player:Player):Projectile {
-        if (!player.object.hasOwnProperty('_direction')) {
-            return;
-        }
-        try {
-            return new Bullet((<Soldier>player.object).projectileOrigin, (<Soldier>player.object).projectileDirection);
-        } catch(e) {
-            // player is not a soldier, can't fire
-            return undefined;
-        }
-        
+        firedProjectiles.push(bullet);
     }
 }

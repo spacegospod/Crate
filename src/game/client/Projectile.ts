@@ -20,7 +20,7 @@ namespace Crate {
 
         private _lastUpdate: number;
 
-        constructor(origin:Point, direction:Vector, speed:number, object:BasicObject) {
+        constructor(origin:Point, direction:Vector, speed:number, object:BasicObject, timestamp:number=Date.now()) {
             if (!origin) {
                 throw 'No origin point provided when constructing ray';
             }
@@ -30,13 +30,17 @@ namespace Crate {
             super(origin, direction);
 
             this._speed = speed;
-            this._timestamp = Date.now();
+            this._timestamp = timestamp;
             this._object = object;
             this._lastUpdate = this._timestamp;
         }
 
         update() {
             this._lastUpdate = Date.now();
+        }
+
+        get timestamp():number {
+            return this._timestamp;
         }
 
         get lastUpdate():number {

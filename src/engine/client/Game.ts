@@ -91,6 +91,10 @@ namespace Crate {
             }
         }
 
+        emitNetworkData(eventId:string, data) {
+            this._socketio.emit(eventId, data);
+        }
+
         attachNetworkHandler(eventId:string, callback) {
             this._socketio.on(eventId, function(data) {
                 callback(data);
@@ -109,7 +113,7 @@ namespace Crate {
             return this._scene;
         }
 
-        get serverTimeOffset() {
+        get serverTimeOffset(): number {
             return this._connectionMonitor.serverTimeOffset;
         }
 
