@@ -41,10 +41,13 @@ namespace Crate {
         private getAxes(box:BoundingBox) {
             var axes = [];
             
-            axes.push(this.getAxis(box.vertices[0], box.vertices[1]));
-            axes.push(this.getAxis(box.vertices[1], box.vertices[2]));
-            axes.push(this.getAxis(box.vertices[2], box.vertices[3]));
-            axes.push(this.getAxis(box.vertices[3], box.vertices[0]));
+            for (var i = 4; i > 0; i--) {
+                try {
+                    axes.push(this.getAxis(box.vertices[4 - i], box.vertices[4 - (i + 1)]));
+                } catch (e) {
+                    // ignore axis
+                }
+            }
 
             return axes;
         }

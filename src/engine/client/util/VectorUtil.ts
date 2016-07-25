@@ -51,7 +51,7 @@ namespace Crate {
 
         // Returns a normalized version of the provided vector
         normalize(vector:Vector):Vector {
-            var vectorLength = this.length(vector)
+            var vectorLength = this.length(vector);
             return new Vector(vector.x /= vectorLength, vector.y /= vectorLength);
         }
 

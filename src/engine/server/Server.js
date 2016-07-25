@@ -1,5 +1,11 @@
 // Server constructor function
 function Server(levelName) {
+    if (!levelName) {
+        throw 'No level specified!';
+    }
+    if (!process.env.CRATE_PATH) {
+        throw 'CRATE_PATH undefined!';
+    }
     var express = require('express');
     var fs = require('fs');
     var server = express();
