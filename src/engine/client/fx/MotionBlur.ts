@@ -17,7 +17,7 @@ namespace Crate {
             this._events = [];
         }
 
-        addBlurEvent(point:Point) {
+        addBlurEvent(point:Point, rotation:number=0) {
             if (!point) {
                 return;
             }
@@ -26,7 +26,7 @@ namespace Crate {
                 this._events.shift();
             }
 
-            var data:BlurData = new BlurData(point);
+            var data:BlurData = new BlurData(point, rotation);
 
             this._events.push(data);
         }
@@ -47,10 +47,12 @@ namespace Crate {
     class BlurData {
         private _timestamp: number;
         private _position: Point;
+        private _rotation: number;
 
-        constructor(position:Point) {
+        constructor(position:Point, rotation:number=0) {
             this._timestamp = Date.now();
             this._position = new Point(position.x, position.y);
+            this._rotation = rotation;
         }
 
         get timestamp():number {
@@ -59,6 +61,10 @@ namespace Crate {
 
         get position():Point {
             return new Point(this._position.x, this._position.y);
+        }
+
+        get rotation():number {
+            return this._rotation;
         }
     }
 }

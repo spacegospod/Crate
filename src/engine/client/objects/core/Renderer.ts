@@ -130,7 +130,12 @@ namespace Crate {
                 var p:Point = p1;
 
                 for (var j = 0; j < k; j++) {
-                    this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
+                    if (blurEvents[i].rotation >= 0 && blurEvents[i].rotation < 1) {
+                        this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
+                    } else {
+                        this.drawRotated(image, p.x, p.y, blurEvents[i].rotation);
+                    }
+                    
                     p = new Point(p.x + (semiDiagonal * direction.x), p.y + (semiDiagonal * direction.y));
                 }
             }

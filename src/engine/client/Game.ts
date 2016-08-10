@@ -118,7 +118,6 @@ namespace Crate {
         }
 
         private loop() {
-            console.log(this.scene.objects.length);
             this.delta.update(Date.now());
 
             this.loopCalls(this.preProcessCalls);

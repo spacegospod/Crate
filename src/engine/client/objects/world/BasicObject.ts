@@ -75,7 +75,7 @@ namespace Crate {
                 this.boundingBox.position = value;
             }
 
-            this.gfx.motionBlur.addBlurEvent(value);
+            this.gfx.motionBlur.addBlurEvent(value, this._rotation);
         }
 
         // property rotation
