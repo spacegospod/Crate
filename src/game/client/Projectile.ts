@@ -72,7 +72,7 @@ namespace Crate {
 
         get ttl() {
             var lifetime = Date.now() - this._timestamp;
-            return 15 * 1000 - lifetime;
+            return 8 * 1000 - lifetime;
         }
     }
 }

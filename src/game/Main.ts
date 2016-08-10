@@ -157,15 +157,17 @@ namespace Crate {
         }
         for (let i in data.projectiles) {
             var proj = data.projectiles[i];
-            var bullet = new Projectile(
-                new Point(proj.origin.x, proj.origin.y),
-                new Vector(proj.direction.x, proj.direction.y),
-                <number>proj.speed,
-                createObject(proj.object),
-                <number>proj.timestamp)
-            projectiles.push(bullet);
-            game.scene.add(bullet.object);
-            game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
+            if (isNetworkUIDUnique(proj.object.networkUid)) {
+                var bullet = new Projectile(
+                    new Point(proj.origin.x, proj.origin.y),
+                    new Vector(proj.direction.x, proj.direction.y),
+                    <number>proj.speed,
+                    createObject(proj.object),
+                    <number>proj.timestamp)
+                projectiles.push(bullet);
+                game.scene.add(bullet.object);
+                game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
+            }
         }
     }
 
@@ -222,5 +224,15 @@ namespace Crate {
 
         projectiles.push(bullet);
         firedProjectiles.push(bullet);
+    }
+
+    function isNetworkUIDUnique(uid:string) {
+        for (let i in game.scene.objects) {
+            if (game.scene.objects[i].networkUid === uid) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

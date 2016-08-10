@@ -18,6 +18,8 @@ namespace Crate {
 
         networkUid: string;
 
+        gfx: GFX;
+
         // The rotaton in degrees. Used for drawing the image
         private _rotation: number;
         // The key of the image for this object
@@ -33,6 +35,7 @@ namespace Crate {
                 zIndex = 0,
                 collidable = false) {
             this.imageKey = imageKey;
+            this.gfx = new GFX();
             this.position = (position === undefined) ? new Point(0, 0) : position;
             this.rotation = rotation;
             this.zIndex = zIndex;
@@ -71,6 +74,8 @@ namespace Crate {
             if (typeof this.boundingBox !== 'undefined') {
                 this.boundingBox.position = value;
             }
+
+            this.gfx.motionBlur.addBlurEvent(value);
         }
 
         // property rotation

@@ -14,6 +14,7 @@ namespace Crate {
                     0,
                     1,
                     false));
+            this.object.gfx.motionBlur.enabled = true;
         }
     }
 }

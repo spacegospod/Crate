@@ -60,6 +60,8 @@ namespace Crate {
                     } else {
                         this.drawRotated(image, p.x, p.y, object.rotation);
                     }
+
+                    this.drawGfx(image, object);
                     /*
                     UNCOMMENT TO DRAW BOUNDING BOXES
                     if (object.boundingBox !== undefined) {
@@ -93,6 +95,47 @@ namespace Crate {
                     */
                 }
             }
+        }
+
+        private drawGfx(image, object:BasicObject) {
+            if (!object.gfx) {
+                return;
+            }
+
+            // draw motion blur
+            if (object.gfx.motionBlur && object.gfx.motionBlur.enabled) {
+                this.drawMotionBlur(image, object);
+            }
+        }
+
+        private drawMotionBlur(image, object:BasicObject) {
+            if ((<DynamicObject>object).speed === 0) {
+                return;
+            }
+
+            var blurEvents = object.gfx.motionBlur.blurEvents;
+            var alphaStep:number = 0.2 / blurEvents.length;
+            var semiDiagonal = Math.sqrt(Math.pow(image.width, 2) + Math.pow(image.height, 2)) / 3;
+            for (var i = 0; i < blurEvents.length - 1; i++) {
+                this.context.globalAlpha = (i * alphaStep) + 0.01;
+                var p1:Point = this.viewPort.translateInViewport(new Point(blurEvents[i].position.x, blurEvents[i].position.y));
+                var p2:Point = this.viewPort.translateInViewport(new Point(blurEvents[i + 1].position.x, blurEvents[i + 1].position.y));
+
+                if (p1.x === p2.x && p1.y === p2.y) {
+                    continue;
+                }
+
+                var k = Math.ceil(VU.length(VU.createVector(p1, p2)) / semiDiagonal);
+                var direction:Vector = VU.normalize(VU.createVector(p1, p2));
+                var p:Point = p1;
+
+                for (var j = 0; j < k; j++) {
+                    this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
+                    p = new Point(p.x + (semiDiagonal * direction.x), p.y + (semiDiagonal * direction.y));
+                }
+            }
+
+            this.context.globalAlpha = 1;
         }
 
         private drawRotated(image, x:number, y:number, rotation) {
