@@ -14,10 +14,11 @@ namespace Crate {
             super('soldier',
                 position,
                 0,
-                1,
+                10,
                 true,
                 direction,
                 speed);
+            this.gfx.blood.enabled = true;
         }
 
         get projectileOrigin():Point {

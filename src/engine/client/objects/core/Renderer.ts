@@ -55,6 +55,7 @@ namespace Crate {
 
                     var p = this.viewPort.translateInViewport(new Point(object.position.x, object.position.y));
 
+                    this.context.globalAlpha = object.opacity || 1;
                     if (object.rotation == 0) {
                         this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
                     } else {
@@ -95,6 +96,8 @@ namespace Crate {
                     */
                 }
             }
+
+            this.context.globalAlpha = 1;
         }
 
         private drawGfx(image, object:BasicObject) {

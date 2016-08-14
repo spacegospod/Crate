@@ -31,9 +31,17 @@ namespace Crate {
 
         game.inputRegistry.attachCustomListener(true, 'click', clickHandler);
 
+        attachListeners();
+
         game.attachNetworkHandler('serverpush', onServerPush);
 
         game.begin([userInputCallback, processProjectiles], [sendClientState, clearFrameState]);
+    }
+
+    function attachListeners() {
+        addEventListener('objectExpired', (e: any) => {
+            game.scene.remove(e.detail.object);
+        });
     }
 
     /*------ Game loop callbacks ------*/
@@ -65,6 +73,9 @@ namespace Crate {
                 } else if (data.length > 0) {
                     projectiles.splice(projectiles.indexOf(projectile), 1);
                     game.scene.remove(projectile.object);
+                    if (object.gfx && object.gfx.blood.enabled) {
+                        game.scene.add(new BloodStain(object.position));
+                    }
                     return;
                 }
             }
