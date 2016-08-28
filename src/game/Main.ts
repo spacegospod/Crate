@@ -164,7 +164,11 @@ namespace Crate {
     function sendClientState() {
         try {
             game.emitNetworkData('clientUpdate',
-                networkPayloadBuilder.build(player, firedProjectiles, impacts, game.serverTimeOffset))
+                networkPayloadBuilder.build(
+                    [{type: 'Soldier', object: player.object}],
+                    firedProjectiles,
+                    impacts,
+                    game.serverTimeOffset));
         } catch(e) {
             console.error(e || e.message);
         }
@@ -291,7 +295,19 @@ namespace Crate {
     }
 
     function createObject(data):BasicObject {
-        var newObject:BasicObject = new BasicObject();
+        var newObject;
+        try {
+            var template = `(function() {return new Crate.${data.type}();})()`;
+            newObject = eval(template);
+        } catch(e) {
+            // stay silent
+        }
+
+        if (typeof newObject === 'undefined') {
+            // fall back option
+            newObject = new BasicObject();
+        }
+
         updateProperties(newObject, data);
         return newObject;
     }

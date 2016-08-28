@@ -9,7 +9,7 @@ namespace Crate {
 
         constructor(
                 position:Point = new Point(0, 0),
-                direction: Vector = new Vector(0, 0),
+                direction: Vector = new Vector(0, 1),
                 speed = 0) {
             super('soldier',
                 position,

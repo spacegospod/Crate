@@ -16,12 +16,12 @@ namespace Crate {
                 rotation:number = 0,
                 zIndex = 0,
                 collidable = false,
-                direction: Vector = new Vector(0, 0),
+                direction: Vector = new Vector(0, 1),
                 speed = 0) {
             super(imageKey, position, rotation, zIndex, collidable);
             this.speed = speed;
             this.direction = (direction === undefined)
-                    ? new Vector(0, 0)
+                    ? new Vector(0, 1)
                     : new Vector(direction.x, direction.y);
         }
 

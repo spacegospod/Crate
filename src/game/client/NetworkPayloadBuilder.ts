@@ -4,13 +4,17 @@ namespace Crate {
         Constructs data objects representing the client's state.
     */
     export class NetworkPayloadBuilder {
-        build(player:Player, projectiles:Projectile[], impacts, serverTimeOffset:number) {
+        build(objects, projectiles:Projectile[], impacts, serverTimeOffset:number) {
             try {
                 var payload = {
-                    objects: [this.buildObjectData(player.object)],
+                    objects: [],
                     projectiles: [],
                     impacts: []
                 };
+
+                for (let i in objects) {
+                    payload.objects.push(this.buildObjectData(objects[i].object, objects[i].type));
+                }
 
                 for (let i in projectiles) {
                     payload.projectiles.push(this.buildProjectileData(projectiles[i], serverTimeOffset));
@@ -27,7 +31,7 @@ namespace Crate {
             }
         }
 
-        private buildObjectData(object:BasicObject) {
+        private buildObjectData(object:BasicObject, type:string='BasicObject') {
             return {
                 uid: object.uid,
                 position: {
@@ -42,7 +46,8 @@ namespace Crate {
                 gfx: {
                     motionBlur: object.gfx.motionBlur.enabled,
                     blood: object.gfx.blood.enabled
-                }
+                },
+                type: type
             }
         }
 
