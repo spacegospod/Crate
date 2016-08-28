@@ -10,9 +10,15 @@ namespace Crate {
             this.preloadSounds(audioMap);
         }
 
-        play(id:string) {
+        play(id:string, volume:number) {
             if (typeof this.soundsMap[id] !== 'undefined') {
-                this.soundsMap[id].cloneNode(false).play();
+                if (volume < 0 || volume > 1) {
+                    return;
+                }
+
+                var node = this.soundsMap[id].cloneNode(false);
+                node.volume = volume;
+                node.play();
             }
         }
 

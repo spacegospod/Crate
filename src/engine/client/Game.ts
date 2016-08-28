@@ -87,7 +87,7 @@ namespace Crate {
 
         triggerEvent(type, data) {
             if (type == EVENTS.AUDIO) {
-                this.audio.play(data.soundId);
+                this.audio.play(data.soundId, data.volume);
             }
         }
 

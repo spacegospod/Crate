@@ -242,7 +242,9 @@ namespace Crate {
                     <number>proj.timestamp)
                 projectiles.push(bullet);
                 game.scene.add(bullet.object);
-                game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
+                var distance:number = VU.length(VU.createVector(player.object.position, proj.origin));
+                var volume:number = (2500 - distance) / 2500;
+                game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire', volume: volume});
             }
         }
     }
@@ -319,7 +321,10 @@ namespace Crate {
             return;
         }
         game.scene.add(bullet.object);
-        game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire'});
+
+        var distance:number = VU.length(VU.createVector(player.object.position, origin));
+        var volume:number = (2500 - distance) / 2500;
+        game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire', volume: volume});
 
         projectiles.push(bullet);
         firedProjectiles.push(bullet);
