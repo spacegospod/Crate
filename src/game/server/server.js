@@ -12,19 +12,40 @@ var io = server.getWebSocketEndpoint();
 // frame, it does provide frequent updates for accurate interpolation on the client side
 const SERVER_PUSH_TIMEOUT = 10;
 const SERVER_PUST_EVENT_ID = "serverpush";
+const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
 var clientsData = {};
 
 function buildPushData() {
     var data = {
         objects: [],
-        projectiles: []
+        projectiles: [],
+        impacts: []
     };
+
+    // removes duplicate impact events
+    function filterImpacts(impacts) {
+        var result = [];
+        for (var i in impacts) {
+            var isDuplicate = false;
+            for (var j in data.impacts) {
+                if (impacts[i].object === data.impacts[j].object
+                    && impacts[i].projectile === data.impacts[j].projectile) {
+                    isDuplicate = true;
+                }
+            }
+
+            if (!isDuplicate) {
+                result.push(impacts[i]);
+            }
+        }
+    }
 
     for (var i in clientsData) {
         var clientData = clientsData[i];
         data.objects.push.apply(data.objects, clientData.objects);
         data.projectiles.push.apply(data.projectiles, clientData.projectiles);
+        data.impacts.push.apply(data.impacts, clientData.impacts);
     }
 
     return data;
@@ -40,10 +61,16 @@ io.sockets.on('connection', function(socket) {
         clientsData[socket.id] = data;
     });
     socket.on('disconnect', function() {
-        delete clientsData[socket.id];
+        if (typeof clientsData[socket.id] !== 'undefined') {
+            io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+            delete clientsData[socket.id];
+        }
     });
     socket.on('error', function() {
-        delete clientsData[socket.id];
+        if (typeof clientsData[socket.id] !== 'undefined') {
+            io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+            delete clientsData[socket.id];
+        }
     });
     // control event handlers
     socket.on('serverTimeReq', function(data) {

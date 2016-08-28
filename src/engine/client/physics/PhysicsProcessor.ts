@@ -82,7 +82,7 @@ namespace Crate {
             for (var i in objects) {
                 var object:BasicObject = objects[i];
                 var image = imageCache.getImageByKey(object.imageKey);
-                if (!object.boundingBox && typeof image !== 'undefined') {
+                if (!object.boundingBox && typeof image !== 'undefined' && image.width > 0 && image.height > 0) {
                     object.boundingBox = this.boundingBoxGenerator.generateBoundingBoxForImage(
                         object.imageKey,
                         image.width,

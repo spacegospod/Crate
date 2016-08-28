@@ -6,6 +6,9 @@ namespace Crate {
     var game: Game;
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
+    var impacts = [];
+
+    var serverPushQueue = [];
 
     // All projectiles fired during the current frame
     var firedProjectiles:Projectile[] = [];
@@ -35,7 +38,9 @@ namespace Crate {
 
         game.attachNetworkHandler('serverpush', onServerPush);
 
-        game.begin([userInputCallback, processProjectiles], [sendClientState, clearFrameState]);
+        game.attachNetworkHandler('playerdisconnected', onPlayerDisconnected);
+
+        game.begin([applyServerPushData, userInputCallback, processProjectiles], [sendClientState, clearFrameState]);
     }
 
     function attachListeners() {
@@ -65,17 +70,18 @@ namespace Crate {
         var position:Point = projectile.getPosition(Date.now());
         for (var j in game.scene.objects) {
             var object:BasicObject = game.scene.objects[j];
-            if (object.collidable) {
+            if (object.collidable && typeof object.boundingBox !== 'undefined') {
                 var data:Point[] = environment.collision.line.getIntersectionDataForProjectile(projectile, object.boundingBox, environment.delta);
-                // We use 1 bounding box per object -> we cannot have more than two collision points
+                // We use 1 bounding box per object -> we cannot have more than two intersection points
                 if (typeof data === 'undefined') {
                     continue;
                 } else if (data.length > 0) {
+                    impacts.push({
+                        projectile: projectile.object.networkUid,
+                        object: object.networkUid
+                    });
                     projectiles.splice(projectiles.indexOf(projectile), 1);
                     game.scene.remove(projectile.object);
-                    if (object.gfx && object.gfx.blood.enabled) {
-                        game.scene.add(new BloodStain(object.position));
-                    }
                     return;
                 }
             }
@@ -85,6 +91,8 @@ namespace Crate {
 
     function clearFrameState() {
         firedProjectiles = [];
+        impacts = [];
+        serverPushQueue = [];
     }
 
     /*------ Input handlers ------*/
@@ -156,18 +164,71 @@ namespace Crate {
     function sendClientState() {
         try {
             game.emitNetworkData('clientUpdate',
-                networkPayloadBuilder.build(player, firedProjectiles, game.serverTimeOffset))
+                networkPayloadBuilder.build(player, firedProjectiles, impacts, game.serverTimeOffset))
         } catch(e) {
             console.error(e || e.message);
         }
     }
 
     function onServerPush(data) {
-        for (let i in data.objects) {
-            updateObject(data.objects[i]);
+        serverPushQueue.push(data);
+    }
+
+    function applyServerPushData() {
+        var objects = [];
+        var projectiles = [];
+        var impacts = [];
+
+        for (var i in serverPushQueue) {
+            objects.push.apply(objects, serverPushQueue[i].objects);
+            projectiles.push.apply(projectiles, serverPushQueue[i].projectiles);
+            impacts.push.apply(impacts, serverPushQueue[i].impacts);
         }
-        for (let i in data.projectiles) {
-            var proj = data.projectiles[i];
+
+        updateObjects(objects);
+        updateProjectiles(projectiles);
+        updateImpacts(impacts);
+    }
+
+    function onPlayerDisconnected(data) {
+        for (let i in data) {
+            for (let j in game.scene.objects) {
+                if (data[i].networkUid === game.scene.objects[j].networkUid) {
+                    game.scene.remove(game.scene.objects[j]);
+                }
+            }
+        }
+    }
+
+    function updateObjects(data) {
+        function updateObject(data) {
+            for (let i in game.scene.objects) {
+                var object = game.scene.objects[i];
+                if (object.networkUid != data.networkUid) {
+                    continue;
+                }
+
+                if (!(data.networkUid == player.object.networkUid)) {
+                    updateProperties(object, data);
+                }
+                return;
+            }
+
+            // object not found, create
+            var newobj = createObject(data);
+            if (typeof newobj !== 'undefined') {
+                game.scene.add(newobj);
+            }
+        }
+
+        for (let i in data) {
+            updateObject(data[i]);
+        }
+    }
+
+    function updateProjectiles(data) {
+        for (let i in data) {
+            var proj = data[i];
             if (isNetworkUIDUnique(proj.object.networkUid)) {
                 var bullet = new Projectile(
                     new Point(proj.origin.x, proj.origin.y),
@@ -182,24 +243,26 @@ namespace Crate {
         }
     }
 
-    function updateObject(data) {
-        for (var i in game.scene.objects) {
-            var object = game.scene.objects[i];
-            if (object.networkUid != data.networkUid) {
+    function updateImpacts(data) {
+        var objectsByNetworkUid = [];
+        for (let i in game.scene.objects) {
+            let object:BasicObject = game.scene.objects[i];
+            objectsByNetworkUid[object.networkUid] = object;
+        }
+
+        for (let i in data) {
+            let impact = data[i];
+            let object:BasicObject = objectsByNetworkUid[impact.object];
+
+            if (typeof object === 'undefined') {
                 continue;
             }
 
-            if (!(data.networkUid == player.object.networkUid)) {
-                updateProperties(object, data);
+            if (object.gfx && object.gfx.blood.enabled) {
+                game.scene.add(new BloodStain(object.position));
             }
-            return;
         }
-
-        // object not found, create
-        var newobj = createObject(data);
-        if (typeof newobj !== 'undefined') {
-            game.scene.add(newobj);
-        }
+        return;
     }
 
     function updateProperties(object:BasicObject, props) {
@@ -212,6 +275,16 @@ namespace Crate {
         if (typeof props.collidable !== 'undefined') {
             object.collidable = props.collidable;
         }
+        if (typeof props.networkUid !== 'undefined') {
+            object.networkUid = props.networkUid;
+        }
+        if (typeof props.zIndex !== 'undefined') {
+            object.zIndex = props.zIndex;
+        }
+        if (typeof props.gfx !== 'undefined') {
+            object.gfx.motionBlur.enabled = props.gfx.motionBlur;
+            object.gfx.blood.enabled = props.gfx.blood;
+        }
         if (props.imageKey && props.imageKey != object.imageKey) {
             object.imageKey = props.imageKey;
         }
@@ -219,7 +292,6 @@ namespace Crate {
 
     function createObject(data):BasicObject {
         var newObject:BasicObject = new BasicObject();
-        newObject.networkUid = data.networkUid;
         updateProperties(newObject, data);
         return newObject;
     }

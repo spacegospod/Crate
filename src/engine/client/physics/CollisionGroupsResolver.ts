@@ -28,7 +28,7 @@ namespace Crate {
                         continue;
                     }
 
-                    if (this.isCellRelevant(this.getGridCell(objectToTest), relevantCells)) {
+                    if (objectToTest.collidable && this.isCellRelevant(this.getGridCell(objectToTest), relevantCells)) {
                         group.targets.push(objectToTest);
                     }
                 }

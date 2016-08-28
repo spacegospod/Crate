@@ -4,15 +4,21 @@ namespace Crate {
         Constructs data objects representing the client's state.
     */
     export class NetworkPayloadBuilder {
-        build(player:Player, projectiles:Projectile[], serverTimeOffset:number) {
+        build(player:Player, projectiles:Projectile[], impacts, serverTimeOffset:number) {
             try {
                 var payload = {
                     objects: [this.buildObjectData(player.object)],
-                    projectiles: []
+                    projectiles: [],
+                    impacts: []
                 };
 
-                for (var i in projectiles) {
+                for (let i in projectiles) {
                     payload.projectiles.push(this.buildProjectileData(projectiles[i], serverTimeOffset));
+                }
+
+                for (let i in impacts) {
+                    // directly serializeable
+                    payload.impacts = impacts;
                 }
 
                 return payload;
@@ -31,7 +37,12 @@ namespace Crate {
                 rotation: object.rotation,
                 imageKey: object.imageKey,
                 collidable: object.collidable,
-                networkUid: object.networkUid
+                networkUid: object.networkUid,
+                zIndex: object.zIndex,
+                gfx: {
+                    motionBlur: object.gfx.motionBlur.enabled,
+                    blood: object.gfx.blood.enabled
+                }
             }
         }
 
