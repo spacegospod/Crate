@@ -297,19 +297,9 @@ namespace Crate {
     }
 
     function createObject(data):BasicObject {
-        var newObject;
-        try {
-            var template = `(function() {return new Crate.${data.type}();})()`;
-            newObject = eval(template);
-        } catch(e) {
-            // stay silent
-        }
-
-        if (typeof newObject === 'undefined') {
-            // fall back option
-            newObject = new BasicObject();
-        }
-
+        var constructorFunction = Crate[data.type] || BasicObject;
+        var newObject = new constructorFunction();
+        
         updateProperties(newObject, data);
         return newObject;
     }
@@ -336,6 +326,7 @@ namespace Crate {
                 return false;
             }
         }
+
 
         return true;
     }
