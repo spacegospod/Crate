@@ -7,6 +7,7 @@ namespace Crate {
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
     var impacts = [];
+    var spawnLocations = [];
 
     var serverPushQueue = [];
 
@@ -23,11 +24,12 @@ namespace Crate {
             return new Soldier();
         });
         var level = levelParser.parse(levelData);
+        spawnLocations = level.spawnLocations;
 
-        viewPort = new ViewPort(800, 600);
+        viewPort = new ViewPort(1024, 768);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
-        player = new Player(new Soldier(new Point(300, 700), new Vector(1, 0)));
+        player = new Player(new Soldier(getSpawnLocation(), new Vector(1, 0)));
 
         game.scene.add(player.object);
         viewPort.centerOn(player.object);
@@ -156,7 +158,6 @@ namespace Crate {
             fireBullet((<Soldier>player.object).projectileOrigin, (<Soldier>player.object).projectileDirection);
         } catch(e) {
             // player is not a soldier, can't fire
-            return undefined;
         }
     }
 
@@ -299,7 +300,7 @@ namespace Crate {
     function createObject(data):BasicObject {
         var constructorFunction = Crate[data.type] || BasicObject;
         var newObject = new constructorFunction();
-        
+
         updateProperties(newObject, data);
         return newObject;
     }
@@ -327,7 +328,11 @@ namespace Crate {
             }
         }
 
-
         return true;
+    }
+
+    function getSpawnLocation():Point {
+        var index = Math.floor(Math.random() * spawnLocations.length);
+        return spawnLocations[index];
     }
 }

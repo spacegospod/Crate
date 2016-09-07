@@ -7,10 +7,12 @@ namespace Crate {
     */
     export class Level {
         map: Map;
+        spawnLocations;
         objects;
 
-        constructor(map:Map, objects) {
+        constructor(map:Map, spawnLocations, objects) {
             this.map = map;
+            this.spawnLocations = spawnLocations;
             this.objects = objects;
         }
     }

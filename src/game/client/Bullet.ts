@@ -5,7 +5,7 @@ namespace Crate {
         A bullet projectile.
     */
     export class Bullet extends Projectile {
-        static BULLET_SPEED: number = 800;
+        static BULLET_SPEED: number = 900;
 
         constructor(origin:Point, direction:Vector) {
             super(origin, direction, Bullet.BULLET_SPEED,

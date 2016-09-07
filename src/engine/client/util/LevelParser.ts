@@ -24,9 +24,10 @@ namespace Crate {
             try {
                 var initialData = JSON.parse(data);
                 var map:Map = this.parseMap(initialData.mapData);
+                var spawnLocations = this.parseSpawnLocations(initialData.spawnLocationsData);
                 var objects = this.parseObjects(initialData.objectsData);
 
-                return new Level(map, objects);
+                return new Level(map, spawnLocations, objects);
             } catch(e) {
                 console.error('Unable to parse level, got: ' + e.message);
             }
@@ -43,6 +44,21 @@ namespace Crate {
                 return map;
             } catch(e) {
                 throw new Error('Unable to create map, got: ' + e.message);
+            }
+        }
+
+        private parseSpawnLocations(spawnLocationsData) {
+            try {
+                var spawnLocations = [];
+
+                for (var i in spawnLocationsData) {
+                    var location = spawnLocationsData[i];
+                    spawnLocations.push(new Point(location.x, location.y));
+                }
+
+                return spawnLocations;
+            } catch(e) {
+                throw new Error('Unable to load spawnLocations, got: ' + e.message);
             }
         }
 
