@@ -42,7 +42,7 @@ namespace Crate {
 
         game.attachNetworkHandler('playerdisconnected', onPlayerDisconnected);
 
-        game.begin([applyServerPushData, userInputCallback, processProjectiles], [sendClientState, clearFrameState]);
+        game.begin([applyServerPushData, userInputCallback, processProjectiles], [sendClientState, drawHud, clearFrameState]);
     }
 
     function attachListeners() {
@@ -89,6 +89,21 @@ namespace Crate {
             }
         }
         projectile.object.position = position;
+    }
+
+    function drawHud() {
+        var context = _canvas.getContext('2d');
+
+        var originalFillStyle = context.fillStyle;
+        var originalAlpha = context.globalAlpha;
+        context.font = '20px Impact';
+        context.fillStyle = '#ffff00';
+        context.globalAlpha = 0.7;
+        context.fillText('HEALTH: ' + player.health, 25, viewPort.height - 20);
+
+        // reset globals
+        context.fillStyle = originalFillStyle;
+        context.globalAlpha = originalAlpha;
     }
 
     function clearFrameState() {
@@ -199,7 +214,9 @@ namespace Crate {
         for (let i in data) {
             for (let j in game.scene.objects) {
                 if (data[i].networkUid === game.scene.objects[j].networkUid) {
-                    game.scene.remove(game.scene.objects[j]);
+                    // The timeout is needed because the server might push some leftover updates
+                    // and re-place the disconnected player on the scene
+                    setTimeout(() => {game.scene.remove(game.scene.objects[j]);}, 1000);
                 }
             }
         }
@@ -251,14 +268,41 @@ namespace Crate {
     }
 
     function updateImpacts(data) {
+        if (typeof data === 'undefined' || data.length === 0) {
+            return;
+        }
+
+        // filters out duplicates
+        function filterImpacts(impacts) {
+            var result = [];
+            for (var i = 0; i < impacts.length; i++) {
+                var isDuplicate = false;
+                var impact = impacts[i];
+                for (var j = i + 1; j < impacts.length; j++) {
+                    if (impact.object === impacts[j].object
+                        && impact.projectile === impacts[j].projectile) {
+                        isDuplicate = true;
+                    }
+                }
+
+                if (!isDuplicate) {
+                    result.push(impact);
+                }
+            }
+
+            return result;
+        }
+
         var objectsByNetworkUid = [];
         for (let i in game.scene.objects) {
             let object:BasicObject = game.scene.objects[i];
             objectsByNetworkUid[object.networkUid] = object;
         }
 
-        for (let i in data) {
-            let impact = data[i];
+        var filteredImpacts = filterImpacts(data);
+
+        for (let i in filteredImpacts) {
+            let impact = filteredImpacts[i];
             let object:BasicObject = objectsByNetworkUid[impact.object];
 
             if (typeof object === 'undefined') {
@@ -268,6 +312,20 @@ namespace Crate {
             if (object.gfx && object.gfx.blood.enabled) {
                 game.scene.add(new BloodStain(object.position));
             }
+
+            if (typeof player.object !== 'undefined'
+                && impact.object === player.object.networkUid) {
+                player.health -= Math.floor((Math.random() * 4) + 1);
+            }
+        }
+
+        /*
+            HACK!
+            Temporary hack to respawn player
+        */
+        if (player.health <= 0) {
+            player.object.position = getSpawnLocation();
+            player.health = 100;
         }
         return;
     }

@@ -15,6 +15,7 @@ const SERVER_PUST_EVENT_ID = "serverpush";
 const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
 var clientsData = {};
+var recentImpacts = [];
 
 function buildPushData() {
     var data = {
@@ -25,27 +26,34 @@ function buildPushData() {
 
     // removes duplicate impact events
     function filterImpacts(impacts) {
-        var result = [];
-        for (var i in impacts) {
-            var isDuplicate = false;
+
+        function isImpactUnique(impact) {
             for (var j in data.impacts) {
-                if (impacts[i].object === data.impacts[j].object
-                    && impacts[i].projectile === data.impacts[j].projectile) {
-                    isDuplicate = true;
+                if (impact.object === data.impacts[j].object
+                    && impact.projectile === data.impacts[j].projectile) {
+                    return false;
                 }
             }
 
-            if (!isDuplicate) {
-                result.push(impacts[i]);
+            return true;
+        }
+
+        var result = [];
+        for (var i in impacts) {
+            var impact = impacts[i];
+            if (isImpactUnique(impact)) {
+                result.push(impact);
             }
         }
+
+        return result;
     }
 
     for (var i in clientsData) {
         var clientData = clientsData[i];
         data.objects.push.apply(data.objects, clientData.objects);
         data.projectiles.push.apply(data.projectiles, clientData.projectiles);
-        data.impacts.push.apply(data.impacts, clientData.impacts);
+        data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
     }
 
     return data;
