@@ -10,12 +10,32 @@ var io = server.getWebSocketEndpoint();
 // is roughly 40ms per cycle.
 // While this does not guarantee that updates will be provided for each and every
 // frame, it does provide frequent updates for accurate interpolation on the client side
-const SERVER_PUSH_TIMEOUT = 10;
+const SERVER_PUSH_TIMEOUT = 8;
 const SERVER_PUST_EVENT_ID = "serverpush";
 const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
 var clientsData = {};
-var recentImpacts = [];
+var registeredImpacts = [];
+
+function registerImpact(impact) {
+    registeredImpacts.push({
+        data: impact,
+        timestamp: Date.now()
+    });
+}
+
+function clearImpacts() {
+    var relevantImpacts = [];
+    var now = Date.now();
+    for (var i in registeredImpacts) {
+        var impact = registeredImpacts[i];
+        if ( (now - impact.timestamp) < 5000) {
+            relevantImpacts.push(impact);
+        }
+    }
+
+    registeredImpacts = relevantImpacts;
+}
 
 function buildPushData() {
     var data = {
@@ -28,9 +48,9 @@ function buildPushData() {
     function filterImpacts(impacts) {
 
         function isImpactUnique(impact) {
-            for (var j in data.impacts) {
-                if (impact.object === data.impacts[j].object
-                    && impact.projectile === data.impacts[j].projectile) {
+            for (var j in registeredImpacts) {
+                if (impact.object === registeredImpacts[j].data.object
+                    && impact.projectile === registeredImpacts[j].data.projectile) {
                     return false;
                 }
             }
@@ -43,6 +63,7 @@ function buildPushData() {
             var impact = impacts[i];
             if (isImpactUnique(impact)) {
                 result.push(impact);
+                registerImpact(impact);
             }
         }
 
@@ -61,6 +82,7 @@ function buildPushData() {
 
 function pushToClients() {
     io.emit(SERVER_PUST_EVENT_ID, buildPushData());
+    clearImpacts();
     setTimeout(pushToClients, SERVER_PUSH_TIMEOUT);
 }
 

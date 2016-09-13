@@ -26,7 +26,7 @@ namespace Crate {
         var level = levelParser.parse(levelData);
         spawnLocations = level.spawnLocations;
 
-        viewPort = new ViewPort(1024, 768);
+        viewPort = new ViewPort(canvas.width, canvas.height);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
         player = new Player(new Soldier(getSpawnLocation(), new Vector(1, 0)));
@@ -257,7 +257,7 @@ namespace Crate {
                     new Vector(proj.direction.x, proj.direction.y),
                     <number>proj.speed,
                     createObject(proj.object),
-                    <number>proj.timestamp)
+                    <number>proj.timestamp - game.serverTimeOffset);
                 projectiles.push(bullet);
                 game.scene.add(bullet.object);
                 var distance:number = VU.length(VU.createVector(player.object.position, proj.origin));
@@ -315,7 +315,7 @@ namespace Crate {
 
             if (typeof player.object !== 'undefined'
                 && impact.object === player.object.networkUid) {
-                player.health -= Math.floor((Math.random() * 4) + 1);
+                player.health -= Math.floor((Math.random() * 10) + 1);
             }
         }
 
@@ -365,7 +365,7 @@ namespace Crate {
 
     /*------ Misc functions ------*/
     function fireBullet(origin:Point, direction:Vector) {
-        var bullet:Projectile = new Bullet(origin, direction)
+        var bullet:Projectile = new Bullet(origin, direction);
         if (typeof bullet === 'undefined') {
             return;
         }

@@ -34,7 +34,7 @@ namespace Crate {
             // cap at 30
             this._latencies = this._latencies.slice(0, 29);
             var serverTime = data.serverTime + this.getMeanLatency();
-            this._serverTimeOffset = now - serverTime;
+            this._serverTimeOffset = serverTime - now;
         }
 
         private getMeanLatency() {

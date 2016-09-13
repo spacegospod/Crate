@@ -24,8 +24,8 @@ namespace Crate {
         get projectileOrigin():Point {
             var aimVector:Vector = this.projectileDirection;
             return new Point(
-                this.position.x + aimVector.x * 28,
-                this.position.y + aimVector.y * 28);
+                this.position.x + aimVector.x * 40,
+                this.position.y + aimVector.y * 40);
         }
 
         get projectileDirection():Vector {
