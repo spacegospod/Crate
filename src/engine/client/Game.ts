@@ -91,7 +91,7 @@ namespace Crate {
             }
         }
 
-        emitNetworkData(eventId:string, data) {
+        emitNetworkData(eventId:string, data=undefined) {
             this._socketio.emit(eventId, data);
         }
 

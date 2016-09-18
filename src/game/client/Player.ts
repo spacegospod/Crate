@@ -10,6 +10,8 @@ namespace Crate {
         private _object: BasicObject;
         private _health: number;
 
+        isAlive: boolean = true;
+
         constructor(object:BasicObject) {
             this._object = object;
             this._health = Player.MAX_HEALTH;

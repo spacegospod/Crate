@@ -50,4 +50,8 @@ function Server(levelName) {
     this.getWebSocketEndpoint = function() {
         return io;
     };
+
+    this.getResourceSync = function(relativePath) {
+        return fs.readFileSync(process.env.CRATE_PATH + relativePath, 'utf8');
+    };
 }

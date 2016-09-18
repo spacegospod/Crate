@@ -1,9 +1,15 @@
-// Read the level from command line
-var level = process.argv[2];
+// Read the level name from command line
+var levelName = process.argv[2];
+
 // Create the crate server
-var server = new Server(level);
+var server = new Server(levelName);
+
 // Get the websocket endpoint
 var io = server.getWebSocketEndpoint();
+
+var spawnLocations = JSON.parse(
+    server.getResourceSync('/levels/' + levelName + '.json'))
+    .spawnLocationsData;
 
 // The requestAnimationFrame method of the HTML5 canvas 2D context is capped
 // at 60 fps. Therefore the game itself is capped at 60 loops per second which
@@ -14,8 +20,24 @@ const SERVER_PUSH_TIMEOUT = 8;
 const SERVER_PUST_EVENT_ID = "serverpush";
 const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
+var deadPlayersData = [];
+
 var clientsData = {};
 var registeredImpacts = [];
+
+function respawnDeadPlayers() {
+    function respawnPlayer(socketId) {
+        var location = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
+        io.to(socketId).emit('spawnPlayer', {location: location});
+    }
+
+    for (var deadPlayerInfo in deadPlayersData) {
+        var info = deadPlayersData[deadPlayerInfo];
+        respawnPlayer(info.socket.id);
+    }
+
+    deadPlayersData = [];
+}
 
 function registerImpact(impact) {
     registeredImpacts.push({
@@ -41,7 +63,8 @@ function buildPushData() {
     var data = {
         objects: [],
         projectiles: [],
-        impacts: []
+        impacts: [],
+        objectsToRemove: []
     };
 
     // removes duplicate impact events
@@ -70,37 +93,60 @@ function buildPushData() {
         return result;
     }
 
-    for (var i in clientsData) {
-        var clientData = clientsData[i];
+    for (var i in deadPlayersData) {
+        var info = deadPlayersData[i];
+        for (var j in info.data) {
+            data.objectsToRemove.push(info.data[j]);
+        }
+        // data.objectsToRemove.push.apply(
+        //     data.objectsToRemove,
+        //     deadPlayersData[i].data
+        //     );
+    }
+
+    for (var j in clientsData) {
+        var clientData = clientsData[j];
+
         data.objects.push.apply(data.objects, clientData.objects);
         data.projectiles.push.apply(data.projectiles, clientData.projectiles);
         data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
     }
+
+    // filter out the objects which will be removed
+    data.objects = data.objects.filter(function(object) {
+        return data.objectsToRemove.indexOf(object.networkUid) < 0;
+    });
 
     return data;
 }
 
 function pushToClients() {
     io.emit(SERVER_PUST_EVENT_ID, buildPushData());
+    respawnDeadPlayers();
     clearImpacts();
     setTimeout(pushToClients, SERVER_PUSH_TIMEOUT);
+}
+
+function disconnectPlayer(socket) {
+    io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+    delete clientsData[socket.id];
 }
 
 io.sockets.on('connection', function(socket) {
     socket.on('clientUpdate', function(data) {
         clientsData[socket.id] = data;
     });
+    socket.on('playerDied', function(data) {
+        deadPlayersData.push({
+            socket: socket,
+            data: data.objectsToRemove
+        });
+    });
     socket.on('disconnect', function() {
-        if (typeof clientsData[socket.id] !== 'undefined') {
-            io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
-            delete clientsData[socket.id];
-        }
+        disconnectPlayer(socket);
     });
     socket.on('error', function() {
-        if (typeof clientsData[socket.id] !== 'undefined') {
-            io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
-            delete clientsData[socket.id];
-        }
+        disconnectPlayer(socket);
     });
     // control event handlers
     socket.on('serverTimeReq', function(data) {

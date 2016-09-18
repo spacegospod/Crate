@@ -13,7 +13,9 @@ namespace Crate {
                 };
 
                 for (let i in objects) {
-                    payload.objects.push(this.buildObjectData(objects[i].object, objects[i].type));
+                    if (typeof objects[i] !== 'undefined') {
+                        payload.objects.push(this.buildObjectData(objects[i].object, objects[i].type));
+                    }
                 }
 
                 for (let i in projectiles) {

@@ -7,7 +7,6 @@ namespace Crate {
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
     var impacts = [];
-    var spawnLocations = [];
 
     var serverPushQueue = [];
 
@@ -24,14 +23,15 @@ namespace Crate {
             return new Soldier();
         });
         var level = levelParser.parse(levelData);
-        spawnLocations = level.spawnLocations;
 
         viewPort = new ViewPort(canvas.width, canvas.height);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
-        player = new Player(new Soldier(getSpawnLocation(), new Vector(1, 0)));
+        player = new Player(new Soldier(new Point(0, 0), new Vector(1, 0)));
+        player.isAlive = false;
 
-        game.scene.add(player.object);
+        // request spawn
+        sendPlayerDied();
         viewPort.centerOn(player.object);
 
         game.inputRegistry.attachCustomListener(true, 'click', clickHandler);
@@ -39,6 +39,8 @@ namespace Crate {
         attachListeners();
 
         game.attachNetworkHandler('serverpush', onServerPush);
+
+        game.attachNetworkHandler('spawnPlayer', onPlayerSpawned);
 
         game.attachNetworkHandler('playerdisconnected', onPlayerDisconnected);
 
@@ -179,9 +181,14 @@ namespace Crate {
     /*------ Network functions ------*/
     function sendClientState() {
         try {
+            var objects = [];
+            if (player.isAlive) {
+                objects.push({type: 'Soldier', object: player.object});
+            }
+
             game.emitNetworkData('clientUpdate',
                 networkPayloadBuilder.build(
-                    [{type: 'Soldier', object: player.object}],
+                    objects,
                     firedProjectiles,
                     impacts,
                     game.serverTimeOffset));
@@ -190,24 +197,47 @@ namespace Crate {
         }
     }
 
+    function sendPlayerDied() {
+        game.emitNetworkData(
+            'playerDied',
+            {
+                objectsToRemove: [
+                    player.object.networkUid
+                ]
+            });
+    }
+
     function onServerPush(data) {
         serverPushQueue.push(data);
+    }
+
+    function onPlayerSpawned(data) {
+        player.health = Player.MAX_HEALTH;
+        player.isAlive = true;
+
+        game.scene.remove(player.object);
+        player.object = new Soldier(new Point(data.location.x, data.location.y), new Vector(0, 1));
+        game.scene.add(player.object);
+        viewPort.centerOn(player.object);
     }
 
     function applyServerPushData() {
         var objects = [];
         var projectiles = [];
         var impacts = [];
+        var objectsToRemove = [];
 
         for (var i in serverPushQueue) {
             objects.push.apply(objects, serverPushQueue[i].objects);
             projectiles.push.apply(projectiles, serverPushQueue[i].projectiles);
             impacts.push.apply(impacts, serverPushQueue[i].impacts);
+            objectsToRemove.push.apply(objectsToRemove, serverPushQueue[i].objectsToRemove);
         }
 
         updateObjects(objects);
         updateProjectiles(projectiles);
         updateImpacts(impacts);
+        updateObjectsToRemove(objectsToRemove);
     }
 
     function onPlayerDisconnected(data) {
@@ -319,15 +349,29 @@ namespace Crate {
             }
         }
 
-        /*
-            HACK!
-            Temporary hack to respawn player
-        */
         if (player.health <= 0) {
-            player.object.position = getSpawnLocation();
-            player.health = 100;
+            player.isAlive = false;
+            game.scene.remove(player.object);
+            sendPlayerDied();
         }
+
         return;
+    }
+
+    function updateObjectsToRemove(networkUids) {
+        var objectsToRemove = [];
+        for (var i in networkUids) {
+            var networkUid = networkUids[i];
+            for (var j in game.scene.objects) {
+                if (game.scene.objects[j].networkUid === networkUid) {
+                    objectsToRemove.push(game.scene.objects[j]);
+                }
+            }
+        }
+
+        for (var i in objectsToRemove) {
+            game.scene.remove(objectsToRemove[i]);
+        }
     }
 
     function updateProperties(object:BasicObject, props) {
@@ -387,10 +431,5 @@ namespace Crate {
         }
 
         return true;
-    }
-
-    function getSpawnLocation():Point {
-        var index = Math.floor(Math.random() * spawnLocations.length);
-        return spawnLocations[index];
     }
 }
