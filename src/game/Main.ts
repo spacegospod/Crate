@@ -14,7 +14,7 @@ namespace Crate {
     var firedProjectiles: Projectile[] = [];
 
     var networkPayloadBuilder: NetworkPayloadBuilder = new NetworkPayloadBuilder();
-    var inputController: InputController = new InputController();
+    var inputController: InputController;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -28,30 +28,38 @@ namespace Crate {
         viewPort = new ViewPort(canvas.width, canvas.height);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
+        inputController = new InputController(game.inputRegistry);
+
         player = new Player(new Soldier(new Point(0, 0), new Vector(1, 0)));
-        player.isAlive = false;
 
         // request spawn
+        player.isAlive = false;
         sendPlayerDied();
-        viewPort.centerOn(player.object);
-
-        game.inputRegistry.attachCustomListener(true, 'click', clickHandler);
 
         attachListeners();
+        attachNetworkHandlers();
 
-        game.attachNetworkHandler('serverpush', onServerPush);
-
-        game.attachNetworkHandler('spawnPlayer', onPlayerSpawned);
-
-        game.attachNetworkHandler('playerdisconnected', onPlayerDisconnected);
-
-        game.begin([applyServerPushData, userInputCallback, processProjectiles], [sendClientState, drawHud, clearFrameState]);
+        game.begin([
+            applyServerPushData,
+            userInputCallback,
+            processProjectiles], [
+            sendClientState,
+            drawHud,
+            clearFrameState]);
     }
 
     function attachListeners() {
         addEventListener('objectExpired', (e: any) => {
             game.scene.remove(e.detail.object);
         });
+    }
+
+    function attachNetworkHandlers() {
+        game.attachNetworkHandler('serverpush', onServerPush);
+
+        game.attachNetworkHandler('spawnPlayer', onPlayerSpawned);
+
+        game.attachNetworkHandler('playerdisconnected', onPlayerDisconnected);
     }
 
     /*------ Game loop callbacks ------*/
@@ -109,10 +117,12 @@ namespace Crate {
         context.globalAlpha = originalAlpha;
     }
 
-    function clearFrameState() {
+    function clearFrameState(environment) {
         firedProjectiles = [];
         impacts = [];
         serverPushQueue = [];
+        // temporary
+        player.health = Math.min(Player.MAX_HEALTH, player.health + (1 * environment.delta.getDelta()));
     }
 
     /*------ Input handlers ------*/
@@ -124,7 +134,7 @@ namespace Crate {
 
     function processKeys(environment) {
         (<DynamicObject>player.object).speed = 0;
-        var movementVector:Vector = inputController.processMovement(environment);
+        var movementVector:Vector = inputController.processMovement();
         var directionVectors = [];
         if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
             (<DynamicObject>player.object).direction = movementVector;
@@ -133,14 +143,9 @@ namespace Crate {
     }
 
     function processMouse(environment) {
-        player.object.rotation = inputController.processRotation(environment, _canvas, player.object.position);
-    }
-
-    function clickHandler(event) {
-        try {
-            fireBullet((<Soldier>player.object).projectileOrigin, (<Soldier>player.object).projectileDirection);
-        } catch(e) {
-            // player is not a soldier, can't fire
+        player.object.rotation = inputController.processRotation(viewPort, _canvas, player.object.position);
+        if (inputController.isLeftMouseBtnPressed() && player.weapon.isReadyToFire && !player.weapon.isFiring) {
+            weaponFireHandler();
         }
     }
 
@@ -212,7 +217,7 @@ namespace Crate {
                 if (data[i].networkUid === game.scene.objects[j].networkUid) {
                     // The timeout is needed because the server might push some leftover updates
                     // and re-place the disconnected player on the scene
-                    setTimeout(() => {game.scene.remove(game.scene.objects[j]);}, 1000);
+                    setTimeout(() => {game.scene.remove(game.scene.objects[j]);}, 5000);
                 }
             }
         }
@@ -374,19 +379,33 @@ namespace Crate {
     }
 
     /*------ Misc functions ------*/
-    function fireBullet(origin:Point, direction:Vector) {
-        var bullet:Projectile = new Bullet(origin, direction);
-        if (typeof bullet === 'undefined') {
+    function weaponFireHandler() {
+        if (!inputController.isLeftMouseBtnPressed()) {
+            player.weapon.isFiring = false;
             return;
         }
-        game.scene.add(bullet.object);
 
-        var distance:number = VU.length(VU.createVector(player.object.position, origin));
+        player.weapon.isFiring = true;
+
+        if (player.weapon.isReadyToFire) {
+            var projectile:Projectile = player.weapon.fire(
+                    player.projectileOrigin,
+                    player.projectileDirection);
+
+            fireProjectile(projectile, player.weapon.soundId);
+        }
+        setTimeout(() => {weaponFireHandler();}, player.weapon.fireInterval);
+    }
+
+    function fireProjectile(projectile:Projectile, soundId:string) {
+        game.scene.add(projectile.object);
+
+        var distance:number = VU.length(VU.createVector(player.object.position, projectile.origin));
         var volume:number = (2500 - distance) / 2500;
-        game.triggerEvent(EVENTS.AUDIO, {soundId: 'fire', volume: volume});
+        game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
 
-        projectiles.push(bullet);
-        firedProjectiles.push(bullet);
+        projectiles.push(projectile);
+        firedProjectiles.push(projectile);
     }
 
     function isNetworkUIDUnique(uid:string) {

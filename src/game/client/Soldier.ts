@@ -20,16 +20,5 @@ namespace Crate {
                 speed);
             this.gfx.blood.enabled = true;
         }
-
-        get projectileOrigin():Point {
-            var aimVector:Vector = this.projectileDirection;
-            return new Point(
-                this.position.x + aimVector.x * 40,
-                this.position.y + aimVector.y * 40);
-        }
-
-        get projectileDirection():Vector {
-            return VU.rotateVector(new Vector(0, -1), -1 * this.rotation);
-        }
     }
 }

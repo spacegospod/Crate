@@ -96,16 +96,27 @@ function buildPushData() {
     for (var i in deadPlayersData) {
         var info = deadPlayersData[i];
         for (var j in info.data) {
-            data.objectsToRemove.push(info.data[j]);
+            try {
+                data.objectsToRemove.push(info.data[j]);
+            } catch(e) {
+                console.log(e);
+            }
         }
     }
 
     for (var j in clientsData) {
         var clientData = clientsData[j];
+        if (typeof clientData === 'undefined') {
+            continue;
+        }
 
-        data.objects.push.apply(data.objects, clientData.objects);
-        data.projectiles.push.apply(data.projectiles, clientData.projectiles);
-        data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
+        try {
+            data.objects.push.apply(data.objects, clientData.objects);
+            data.projectiles.push.apply(data.projectiles, clientData.projectiles);
+            data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     // filter out the objects which will be removed
@@ -124,7 +135,11 @@ function pushToClients() {
 }
 
 function disconnectPlayer(socket) {
-    io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+    try {
+        io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+    } catch (e) {
+        console.log('Failed to disconnect player');
+    }
     delete clientsData[socket.id];
 }
 

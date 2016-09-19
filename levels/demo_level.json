@@ -23,26 +23,6 @@
                 },
                 "collidable": true
             }
-        },
-        {
-            "type": "soldier",
-            "properties": {
-                "rotation": 173,
-                "position": {
-                    "x": 766,
-                    "y": 130
-                }
-            }
-        },
-        {
-            "type": "soldier",
-            "properties": {
-                "rotation": 222,
-                "position": {
-                    "x": 766,
-                    "y": 555
-                }
-            }
         }
     ],
     "mapData": {
