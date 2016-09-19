@@ -11,9 +11,10 @@ namespace Crate {
     var serverPushQueue = [];
 
     // All projectiles fired during the current frame
-    var firedProjectiles:Projectile[] = [];
+    var firedProjectiles: Projectile[] = [];
 
     var networkPayloadBuilder: NetworkPayloadBuilder = new NetworkPayloadBuilder();
+    var inputController: InputController = new InputController();
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -122,52 +123,17 @@ namespace Crate {
     }
 
     function processKeys(environment) {
-        var directionVectors = [];
         (<DynamicObject>player.object).speed = 0;
-
-        // A
-        if (environment.input.getKeyStatus(65)) {
-            directionVectors.push(new Vector(-1, 0));
-        }
-        // W
-        if (environment.input.getKeyStatus(87)) {
-            directionVectors.push(new Vector(0, -1));
-        }
-        // D
-        if (environment.input.getKeyStatus(68)) {
-            directionVectors.push(new Vector(1, 0));
-        }
-        // S
-        if (environment.input.getKeyStatus(83)) {
-            directionVectors.push(new Vector(0, 1));
-        }
-
-        if (directionVectors.length > 0) {
-            var direction = directionVectors[0];
-            for (var i = 1; i < directionVectors.length; i++) {
-                direction = VU.sumVectors(direction, directionVectors[i]);
-            }
-            if (typeof direction !== 'undefined' && VU.length(direction) != 0) {
-                (<DynamicObject>player.object).direction = direction;
-                (<DynamicObject>player.object).speed = Soldier.SPEED;
-            }
+        var movementVector:Vector = inputController.processMovement(environment);
+        var directionVectors = [];
+        if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
+            (<DynamicObject>player.object).direction = movementVector;
+            (<DynamicObject>player.object).speed = Soldier.SPEED;
         }
     }
 
     function processMouse(environment) {
-        var mousePosition = environment.input.getMousePosition();
-        // correct for canvas offset on screen
-        mousePosition.x -= _canvas.getBoundingClientRect().left;
-        mousePosition.y -= _canvas.getBoundingClientRect().top;
-        var playerPosition = environment.viewport.translateInViewport(player.object.position);
-
-        var directionVector:Vector = VU.createVector(mousePosition, playerPosition);
-
-        var angle = VU.findAngle(
-            new Vector(0, 1),
-            directionVector);
-
-        player.object.rotation = directionVector.x > 0 ? 360 - angle : angle;
+        player.object.rotation = inputController.processRotation(environment, _canvas, player.object.position);
     }
 
     function clickHandler(event) {

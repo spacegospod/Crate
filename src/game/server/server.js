@@ -98,10 +98,6 @@ function buildPushData() {
         for (var j in info.data) {
             data.objectsToRemove.push(info.data[j]);
         }
-        // data.objectsToRemove.push.apply(
-        //     data.objectsToRemove,
-        //     deadPlayersData[i].data
-        //     );
     }
 
     for (var j in clientsData) {
