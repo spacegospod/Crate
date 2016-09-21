@@ -91,7 +91,8 @@ namespace Crate {
                 } else if (data.length > 0) {
                     impacts.push({
                         projectile: projectile.object.networkUid,
-                        object: object.networkUid
+                        object: object.networkUid,
+                        damage: projectile.damage
                     });
                     projectiles.splice(projectiles.indexOf(projectile), 1);
                     game.scene.remove(projectile.object);
@@ -110,7 +111,7 @@ namespace Crate {
         context.font = '20px Impact';
         context.fillStyle = '#ffff00';
         context.globalAlpha = 0.7;
-        context.fillText('HEALTH: ' + player.health, 25, viewPort.height - 20);
+        context.fillText('HEALTH: ' + Math.floor(player.health), 25, viewPort.height - 20);
 
         // reset globals
         context.fillStyle = originalFillStyle;
@@ -217,7 +218,9 @@ namespace Crate {
                 if (data[i].networkUid === game.scene.objects[j].networkUid) {
                     // The timeout is needed because the server might push some leftover updates
                     // and re-place the disconnected player on the scene
-                    setTimeout(() => {game.scene.remove(game.scene.objects[j]);}, 5000);
+                    setTimeout(() => {
+                        game.scene.remove(game.scene.objects[j]);
+                    }, 5000);
                 }
             }
         }
@@ -257,6 +260,7 @@ namespace Crate {
                     new Point(proj.origin.x, proj.origin.y),
                     new Vector(proj.direction.x, proj.direction.y),
                     <number>proj.speed,
+                    proj.damage,
                     createObject(proj.object),
                     <number>proj.timestamp - game.serverTimeOffset);
                 projectiles.push(bullet);
@@ -294,7 +298,7 @@ namespace Crate {
             return result;
         }
 
-        var objectsByNetworkUid = [];
+        var objectsByNetworkUid = {};
         for (let i in game.scene.objects) {
             let object:BasicObject = game.scene.objects[i];
             objectsByNetworkUid[object.networkUid] = object;
@@ -315,8 +319,9 @@ namespace Crate {
             }
 
             if (typeof player.object !== 'undefined'
-                && impact.object === player.object.networkUid) {
-                player.health -= Math.floor((Math.random() * 10) + 1);
+                && impact.object === player.object.networkUid
+                && typeof impact.damage !== 'undefined') {
+                player.health -= impact.damage;
             }
         }
 

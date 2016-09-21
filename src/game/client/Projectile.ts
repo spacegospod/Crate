@@ -20,7 +20,14 @@ namespace Crate {
 
         private _lastUpdate: number;
 
-        constructor(origin:Point, direction:Vector, speed:number, object:BasicObject, timestamp:number=Date.now()) {
+        private _damage: number;
+
+        constructor(origin:Point,
+            direction:Vector,
+            speed:number,
+            damage: number,
+            object:BasicObject,
+            timestamp:number=Date.now()) {
             if (!origin) {
                 throw 'No origin point provided when constructing ray';
             }
@@ -30,6 +37,7 @@ namespace Crate {
             super(origin, direction);
 
             this._speed = speed;
+            this._damage = damage;
             this._timestamp = timestamp;
             this._object = object;
             this._lastUpdate = this._timestamp;
@@ -52,6 +60,10 @@ namespace Crate {
         // was altered.
         get speed():number {
             return this._speed;
+        }
+
+        get damage():number {
+            return this._damage;
         }
 
         // Get the position of the projectile at the provided time.

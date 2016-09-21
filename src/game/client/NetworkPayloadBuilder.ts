@@ -57,6 +57,7 @@ namespace Crate {
             return {
                 speed: projectile.speed,
                 direction: projectile.direction,
+                damage: projectile.damage,
                 timestamp: projectile.timestamp + timeOffset,
                 origin: {x: projectile.origin.x, y: projectile.origin.y},
                 object: this.buildObjectData(projectile.object)
