@@ -41,6 +41,7 @@ function Server(levelName, editorMode) {
     server.get("/resources/level.json", function(req, res) {
         if (level) {
             res.send(level);
+            return;
         }
 
         fs.readFile(process.env.CRATE_PATH + '/levels/' + levelName + '.json',
