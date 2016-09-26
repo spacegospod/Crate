@@ -1,5 +1,5 @@
 // Server constructor function
-function Server(levelName) {
+function Server(levelName, editorMode) {
     if (!levelName) {
         throw 'No level specified!';
     }
@@ -18,9 +18,16 @@ function Server(levelName) {
     server.use('/sources', express.static(process.env.CRATE_PATH + '/sources'));
     server.use('/meta', express.static(process.env.CRATE_PATH + '/meta'));
 
+    if (editorMode) {
+        server.use('/editor', express.static(process.env.CRATE_PATH + '/editor'));
+    }
+
     // Host index file under default path
     server.get("/", function(req, res) {
-        fs.readFile(process.env.CRATE_PATH + '/sources/index.html', 'utf8', function(err, data){
+        var indexFilePath = editorMode
+                ? '/editor/index.html'
+                : '/sources/index.html';
+        fs.readFile(process.env.CRATE_PATH + indexFilePath, 'utf8', function(err, data){
             if (!err) {
                 res.send(data);
             } else {
@@ -30,11 +37,19 @@ function Server(levelName) {
     });
 
     // Host level file
+    var level;
     server.get("/resources/level.json", function(req, res) {
+        if (level) {
+            res.send(level);
+        }
+
         fs.readFile(process.env.CRATE_PATH + '/levels/' + levelName + '.json',
             'utf8', function(err, data) {
             if (!err) {
-                res.send(data);
+                if (!level) {
+                    level = data;
+                    res.send(data);
+                }
             } else {
                 console.error(err.message);
             }

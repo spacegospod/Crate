@@ -11,11 +11,11 @@ namespace Crate {
         // The scene containing all objects to be drawn
         private scene: Scene;
         // The map containing the floor textures
-        private level:Map;
+        private map:Map;
         // A cache with all images for the game
         private imageCache: ImageCache;
 
-        constructor(context, viewPort:ViewPort, scene:Scene, level:Map, imageCache:ImageCache) {
+        constructor(context, viewPort:ViewPort, scene:Scene, map:Map, imageCache:ImageCache) {
             if (!context || !viewPort || !scene) {
                 // todo handle error
             }
@@ -23,7 +23,7 @@ namespace Crate {
             this.context = context;
             this.viewPort = viewPort;
             this.scene = scene;
-            this.level = level;
+            this.map = map;
             this.imageCache = imageCache;
 
             this.context.fillStyle = '#333333';
@@ -161,10 +161,10 @@ namespace Crate {
         }
 
         private drawLevel() {
-            for (var row=0; row < this.level.rows; row++) {
-                for (var col=0; col < this.level.columns; col++) {
+            for (var row=0; row < this.map.rows; row++) {
+                for (var col=0; col < this.map.columns; col++) {
                     if (this.testTile(row, col)) {
-                        var tile = this.level.getTileByIndex(row, col);
+                        var tile = this.map.getTileByIndex(row, col);
                         var sprite = this.imageCache.getImageByKey("texture-sprite");
                         var location = this.viewPort.translateInViewport(
                             new Point(

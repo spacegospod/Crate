@@ -6,10 +6,55 @@ const gulp = require('gulp'),
     zip = require('gulp-zip'),
     del = require('del');
 
+/* ------ CLEANUP STEPS ------ */
+
 // Deletes all output directories and files
 gulp.task('clean', function() {
     return del(['build/', 'publish/', 'repo/']);
 });
+
+/* ------ EDITOR STEPS ------ */
+
+// Builds the Crate editor client and
+// publishes it to the repository
+gulp.task('editor-client', function() {
+    return gulp.src(['repo/engine-client.ts',
+        'src/game/client/**/*.ts',
+        'src/editor/client/**/*.ts'])
+        .pipe(ts({
+            target: 'ES5',
+            noImplicitAny: false,
+            out: 'editor.js'
+        }))
+        .pipe(gulp.dest('build/editor/'));
+});
+
+// Packages the editor index file
+gulp.task('editor-index', function() {
+    return gulp.src('src/editor/client/index.html')
+        .pipe(gulp.dest('build/editor/'));
+});
+
+// Builds the Crate editor server and
+// publishes it to the build directory
+gulp.task('editor-server', function() {
+    return gulp.src(['repo/engine-server.js', 'src/editor/server/**/*.js'])
+        .pipe(concat('editor-server.js'))
+        .pipe(gulp.dest('build/editor/'));
+});
+
+// Runs all tasks and packages the editor.
+// Needs a packaged game to run
+gulp.task('install-editor',
+    [
+        'editor-client',
+        'editor-server',
+        'editor-index'
+    ], function() {
+        return;
+    });
+
+/* ------ GAME AND ENGINE STEPS ------ */
 
 // Builds the Crate engine client and
 // publishes it to the repository
@@ -27,15 +72,29 @@ gulp.task('engine-server', function() {
         .pipe(gulp.dest('repo/'));
 });
 
+// Builds the Crate game server and
+// publishes its uglified version to the build directory
+gulp.task('game-server', function() {
+    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
+        .pipe(concat('server.js'))
+        .pipe(uglify())
+        .on('error', function(e) {
+            console.log(e);
+         })
+        .pipe(gulp.dest('build/sources/'));
+});
+
 // Builds the Crate game client and
 // publishes its uglified version to the build directory
 gulp.task('game-client', function() {
     return gulp.src(['repo/engine-client.ts',
-        'src/game/client/**/*.ts',
-        'src/game/Main.ts'])
+        'src/game/client/util/**/*.ts',
+        'src/game/client/objects/**/*.ts',
+        'src/game/client/Main.ts'])
         .pipe(ts({
             target: 'ES5',
             noImplicitAny: false,
+            removeComments: true,
             out: 'game.js'
         }))
         .pipe(uglify())
@@ -49,8 +108,9 @@ gulp.task('game-client', function() {
 // publishes it to the build directory
 gulp.task('game-client-debug', function() {
     return gulp.src(['repo/engine-client.ts',
-        'src/game/client/**/*.ts',
-        'src/game/Main.ts'])
+        'src/game/client/util/**/*.ts',
+        'src/game/client/objects/**/*.ts',
+        'src/game/client/Main.ts'])
         .pipe(ts({
             target: 'ES5',
             noImplicitAny: false,
@@ -81,7 +141,7 @@ gulp.task('game-server-debug', function() {
 
 // Packages the index files
 gulp.task('index', function() {
-    return gulp.src('src/index.html')
+    return gulp.src('src/game/client/index.html')
         .pipe(gulp.dest('build/sources'));
 });
 

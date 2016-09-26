@@ -4,5 +4,6 @@
     "crate": "crate.png",
     "soldier": "soldier.png",
     "texture-default": "default_texture.png",
-    "texture-sprite": "textures.png"
+    "texture-sprite": "textures.png",
+    "invisible": "invisible.png"
 }

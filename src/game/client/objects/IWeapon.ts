@@ -1,3 +1,4 @@
+///<reference path='../../../../repo/engine-client.ts'/>
 namespace Crate {
 
     export interface IWeapon {

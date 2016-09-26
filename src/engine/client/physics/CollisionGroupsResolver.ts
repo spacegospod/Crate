@@ -14,8 +14,7 @@ namespace Crate {
 
             for (var i in sceneObjects) {
                 var object:DynamicObject = sceneObjects[i];
-                // we have no runtime type check :/
-                if (object['direction'] === undefined || object['speed'] === undefined) {
+                if (!(object instanceof DynamicObject)) {
                     continue;
                 }
 

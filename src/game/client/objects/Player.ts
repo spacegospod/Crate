@@ -1,4 +1,4 @@
-///<reference path='../../../repo/engine-client.ts' />
+///<reference path='../../../../repo/engine-client.ts'/>
 namespace Crate {
 
     /*

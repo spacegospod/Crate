@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <style>
+            #container {
+                margin-left: auto;
+                margin-right: auto;
+                width: 800px;
+            }
+
+            #canvas {
+                width: 800px;
+                height: 600px;
+            }
+
+            #texturePicker {
+                position: absolute;
+                top: 0%;
+                right: 0%;
+                user-drag: none;
+                user-select: none;
+                -moz-user-select: none;
+                -webkit-user-drag: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+            }
+        </style>
+    </head>
+    <body style="background-color: #111111;">
+        <div id="container">
+            <canvas id="canvas" width="800" height="600"/>
+        </div>
+
+        <img id="texturePicker" src="/resources/images/textures.png"/>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="sources/game.js"></script>
+        <script src="editor/editor.js"></script>
+        <script>
+            function init() {
+                // get resource maps
+                Promise.all([
+                    getResourcePromise('/meta/image_map.json')])
+                .then(function(resources) {
+                    var canvas = document.getElementById('canvas');
+                    var context = canvas.getContext('2d');
+                    try {
+                        var imageMap = JSON.parse(resources[0]);
+                        // create empty level
+                        var level = new Crate.Level(
+                            new Crate.Map(32, 32),
+                            [],
+                            []);
+                        Editor.init(canvas, context, imageMap, level, io.connect());
+                    } catch(e) {
+                        console.error('Error while loading editor data: ' + (e || e.message));
+                    }
+                })
+                .catch(function(error) {
+                    console.error(error.message);
+                });
+            }
+
+            function getResourcePromise(url) {
+                return new Promise(function(resolve, reject) {
+                    var req = new XMLHttpRequest();
+                    req.open("get", url, true);
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4) {
+                            if (req.status == 200) {
+                                resolve(req.responseText);
+                            } else {
+                                reject('Failed to download resource from: ' + url);
+                            }
+                        }
+                    }
+                    req.send();
+                });
+            }
+
+            // Make sure that html and scripts are loaded before we start the game
+            window.onload = init;
+        </script>
+    </body>
+</html>

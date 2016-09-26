@@ -1,4 +1,4 @@
-///<reference path='Projectile.ts' />
+///<reference path='Projectile.ts'/>
 namespace Crate {
 
     /*
