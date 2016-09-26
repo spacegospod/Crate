@@ -47,10 +47,8 @@ function Server(levelName, editorMode) {
         fs.readFile(process.env.CRATE_PATH + '/levels/' + levelName + '.json',
             'utf8', function(err, data) {
             if (!err) {
-                if (!level) {
-                    level = data;
-                    res.send(data);
-                }
+                level = data;
+                res.send(data);
             } else {
                 console.error(err.message);
             }
