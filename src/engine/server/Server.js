@@ -51,6 +51,7 @@ function Server(levelName, editorMode) {
                 res.send(data);
             } else {
                 console.error(err.message);
+                res.send(void(0));
             }
         });
     });

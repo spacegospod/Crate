@@ -56,17 +56,22 @@
             function init() {
                 // get resource maps
                 Promise.all([
-                    getResourcePromise('/meta/image_map.json')])
+                    getResourcePromise('/meta/image_map.json'),
+                    getResourcePromise('/resources/level.json')])
                 .then(function(resources) {
                     var canvas = document.getElementById('canvas');
                     var context = canvas.getContext('2d');
                     try {
                         var imageMap = JSON.parse(resources[0]);
-                        // create empty level
-                        var level = new Crate.Level(
-                            new Crate.Map(32, 32),
-                            [],
-                            []);
+
+                        var levelParser = new Crate.LevelParser();
+                        levelParser.registerCustomObject('Soldier', function(data) {
+                            return new Crate.Soldier();
+                        });
+
+                        var level = resources[1]
+                            ? levelParser.parse(resources[1])
+                            : new Crate.Level(new Crate.Map(32, 32), [], []);
                         Editor.init(canvas, context, imageMap, level, io.connect());
                     } catch(e) {
                         console.error('Error while loading editor data: ' + (e || e.message));
