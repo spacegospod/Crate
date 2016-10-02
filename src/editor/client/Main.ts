@@ -5,6 +5,7 @@ namespace Editor {
     var _imageMap: any;
     var _texturePicker: any;
     var _objectSelector: any;
+    var _rotationInput: any;
     var _level: Crate.Level;
     var _game: Crate.Game;
 
@@ -17,6 +18,8 @@ namespace Editor {
 
     var mode = 'texture';
 
+    var selectedObject: Crate.BasicObject;
+
     export function init(canvas, context, imageMap, level:Crate.Level, socketIo) {
         document.addEventListener('keypress', onKeyPress);
 
@@ -28,6 +31,7 @@ namespace Editor {
         _texturePicker.addEventListener('click', onTexturePickerClick);
 
         _objectSelector = document.getElementById('objectSelector');
+        _rotationInput = document.getElementById('rotationInput');
         initObjectSelector(imageMap);
 
         _imageCache = new Crate.ImageCache(imageMap);
@@ -58,7 +62,12 @@ namespace Editor {
             _objectSelector.add(option);
         }
 
-        _objectSelector.onchange = onObjectSelected;
+        _objectSelector.onchange = onObjectTypeSelected;
+        _rotationInput.onchange = function() {
+            if (selectedObject) {
+                selectedObject.rotation = _rotationInput.value;
+            }
+        }
     }
 
     function processKeys(environment) {
@@ -95,6 +104,8 @@ namespace Editor {
             var newObject:Crate.BasicObject = new Crate.BasicObject(option.text,
                 new Crate.Point(mapX, mapY));
             _game.scene.add(newObject);
+            selectedObject = newObject;
+            _rotationInput.value = selectedObject.rotation;
         }
     }
 
@@ -112,58 +123,94 @@ namespace Editor {
     }
 
     function onKeyPress(event) {
-        // V
         if (event.keyCode === 118) {
-            var outputLevel: any = {};
-
-            // still blank
-            outputLevel.spawnLocationsData = [];
-
-            outputLevel.mapData = {
-                width: _level.map.columns,
-                height: _level.map.rows,
-                textures: []
-            };
-
-            for (var i = 0; i < _level.map.rows; i++) {
-                outputLevel.mapData.textures.push([]);
-                for (var j = 0; j < _level.map.columns; j++) {
-                    var tile = _level.map.getTileByIndex(j, i);
-                    outputLevel.mapData.textures[i].push({
-                        x: tile.textureIndex.x,
-                        y: tile.textureIndex.y
-                    });
-                }
-            }
-
-            outputLevel.objectsData = [];
-
-            for (var i = 0; i < _game.scene.objects.length; i++) {
-                var object:Crate.BasicObject = _game.scene.objects[i];
-                var data = {
-                    type: (<any>object.constructor).name,
-                    properties: {
-                        imageKey: object.imageKey,
-                        rotation: object.rotation,
-                        position: {
-                            x: object.position.x,
-                            y: object.position.y
-                        },
-                        collidable: object.collidable
-                    }
-                }
-
-                outputLevel.objectsData.push(data);
-            }
-
-            console.log(JSON.stringify(outputLevel, null, 4));
+            // V
+            saveLevel()
+        } else if (event.keyCode === 111) {
+            // O
+            selectObject();
         }
     }
 
-    function onObjectSelected(e) {
+    function onObjectTypeSelected(e) {
         var option = _objectSelector[_objectSelector.selectedIndex];
         var image = _imageCache.getImageByKey(option.text);
         _canvas.style.cursor = `url(resources/images/${option.value}) ${image.width / 2} ${image.height / 2}, auto`;
         mode = 'object';
+        _rotationInput.value = 0;
+
+    }
+
+    function saveLevel() {
+        var outputLevel: any = {};
+
+        // still blank
+        outputLevel.spawnLocationsData = [];
+
+        outputLevel.mapData = {
+            width: _level.map.columns,
+            height: _level.map.rows,
+            textures: []
+        };
+
+        for (var i = 0; i < _level.map.rows; i++) {
+            outputLevel.mapData.textures.push([]);
+            for (var j = 0; j < _level.map.columns; j++) {
+                var tile = _level.map.getTileByIndex(j, i);
+                outputLevel.mapData.textures[i].push({
+                    x: tile.textureIndex.x,
+                    y: tile.textureIndex.y
+                });
+            }
+        }
+
+        outputLevel.objectsData = [];
+
+        for (var i = 0; i < _game.scene.objects.length; i++) {
+            var object:Crate.BasicObject = _game.scene.objects[i];
+            var data = {
+                type: (<any>object.constructor).name,
+                properties: {
+                    imageKey: object.imageKey,
+                    rotation: object.rotation,
+                    position: {
+                        x: object.position.x,
+                        y: object.position.y
+                    },
+                    collidable: object.collidable,
+                    zIndex: object.zIndex,
+                }
+            }
+
+            outputLevel.objectsData.push(data);
+        }
+
+        console.log(JSON.stringify(outputLevel, null, 4));
+    }
+
+    function selectObject() {
+        var mousePosition = _game.inputRegistry.getMousePosition();
+        // correct for canvas offset on screen
+        mousePosition.x -= _canvas.getBoundingClientRect().left;
+        mousePosition.y -= _canvas.getBoundingClientRect().top;
+
+        var godInViewport = _viewPort.translateInViewport(_god.position);
+
+        var mapX = _god.position.x + (mousePosition.x - godInViewport.x);
+        var mapY = _god.position.y + (mousePosition.y - godInViewport.y);
+
+        var dummyObject:Crate.BasicObject = new Crate.BasicObject();
+        dummyObject.boundingBox = new Crate.BoundingBox(new Crate.Point(mapX, mapY), 1, 1);
+
+        for (var i = 0; i < _game.scene.objects.length; i++) {
+            var object:Crate.BasicObject = _game.scene.objects[i];
+            if (new Crate.CollisionDetector().getCollisionData(
+                object,
+                dummyObject)) {
+                selectedObject = object;
+                _rotationInput.value = selectedObject.rotation;
+                return;
+            }
+        }
     }
 }

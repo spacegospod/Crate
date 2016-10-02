@@ -30,6 +30,14 @@
                 top: 400px;
                 right: 159px;
             }
+
+            #rotationInput {
+                position: absolute;
+                top: 400px;
+                right: 100px;
+                width: 45px;
+                height: 14px;
+            }
         </style>
     </head>
     <body style="background-color: #111111;">
@@ -38,6 +46,7 @@
         </div>
 
         <select id="objectSelector"></select>
+        <input type="number" id="rotationInput">Rotation: </input>
         <img id="texturePicker" src="/resources/images/textures.png"/>
 
         <script src="/socket.io/socket.io.js"></script>
