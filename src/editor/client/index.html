@@ -15,14 +15,20 @@
 
             #texturePicker {
                 position: absolute;
-                top: 0%;
-                right: 0%;
+                top: 10px;
+                right: 10px;
                 user-drag: none;
                 user-select: none;
                 -moz-user-select: none;
                 -webkit-user-drag: none;
                 -webkit-user-select: none;
                 -ms-user-select: none;
+            }
+
+            #objectSelector {
+                position: absolute;
+                top: 400px;
+                right: 159px;
             }
         </style>
     </head>
@@ -31,6 +37,7 @@
             <canvas id="canvas" width="800" height="600"/>
         </div>
 
+        <select id="objectSelector"></select>
         <img id="texturePicker" src="/resources/images/textures.png"/>
 
         <script src="/socket.io/socket.io.js"></script>

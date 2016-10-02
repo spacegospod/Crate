@@ -155,7 +155,7 @@ namespace Crate {
         try {
             var objects = [];
             if (player.isAlive) {
-                objects.push({type: 'Soldier', object: player.object});
+                objects.push({object: player.object});
             }
 
             game.emitNetworkData('clientUpdate',

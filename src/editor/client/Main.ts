@@ -4,6 +4,7 @@ namespace Editor {
     var _context: any;
     var _imageMap: any;
     var _texturePicker: any;
+    var _objectSelector: any;
     var _level: Crate.Level;
     var _game: Crate.Game;
 
@@ -12,6 +13,9 @@ namespace Editor {
     var _inputController: Crate.InputController;
 
     var _textureIndex: Crate.Point = new Crate.Point(0, 0);
+    var _imageCache: Crate.ImageCache;
+
+    var mode = 'texture';
 
     export function init(canvas, context, imageMap, level:Crate.Level, socketIo) {
         document.addEventListener('keypress', onKeyPress);
@@ -22,6 +26,11 @@ namespace Editor {
 
         _texturePicker = document.getElementById('texturePicker');
         _texturePicker.addEventListener('click', onTexturePickerClick);
+
+        _objectSelector = document.getElementById('objectSelector');
+        initObjectSelector(imageMap);
+
+        _imageCache = new Crate.ImageCache(imageMap);
 
         _level = level;
 
@@ -39,6 +48,17 @@ namespace Editor {
         _game.init(_imageMap, [], [], context, _viewPort, level);
 
         _game.begin([processKeys], []);
+    }
+
+    function initObjectSelector(imageMap) {
+        for (var key in imageMap) {
+            var option = document.createElement("option");
+            option.text = key;
+            option.value = imageMap[key];
+            _objectSelector.add(option);
+        }
+
+        _objectSelector.onchange = onObjectSelected;
     }
 
     function processKeys(environment) {
@@ -60,13 +80,21 @@ namespace Editor {
         var mapX = _god.position.x + (viewportX - godInViewport.x);
         var mapY = _god.position.y + (viewportY - godInViewport.y);
 
-        var tile = _level.map.getTileByPosition({
-            x: mapX,
-            y: mapY
-        });
+        if (mode === 'texture') {
+            var tile = _level.map.getTileByPosition({
+                x: mapX,
+                y: mapY
+            });
 
-        if (tile) {
-            tile.textureIndex = _textureIndex;
+            if (tile) {
+                tile.textureIndex = _textureIndex;
+            }
+        } else if (mode === 'object') {
+            var option = _objectSelector[_objectSelector.selectedIndex];
+
+            var newObject:Crate.BasicObject = new Crate.BasicObject(option.text,
+                new Crate.Point(mapX, mapY));
+            _game.scene.add(newObject);
         }
     }
 
@@ -78,6 +106,9 @@ namespace Editor {
             (pickerX - (pickerX % Crate.Tile.TILE_WIDTH)) / Crate.Tile.TILE_WIDTH,
             (pickerY - (pickerY % Crate.Tile.TILE_HEIGHT)) / Crate.Tile.TILE_HEIGHT
             );
+
+        _canvas.style.cursor = '';
+        mode = 'texture';
     }
 
     function onKeyPress(event) {
@@ -86,7 +117,6 @@ namespace Editor {
             var outputLevel: any = {};
 
             // still blank
-            outputLevel.objectsData = [];
             outputLevel.spawnLocationsData = [];
 
             outputLevel.mapData = {
@@ -106,7 +136,34 @@ namespace Editor {
                 }
             }
 
+            outputLevel.objectsData = [];
+
+            for (var i = 0; i < _game.scene.objects.length; i++) {
+                var object:Crate.BasicObject = _game.scene.objects[i];
+                var data = {
+                    type: (<any>object.constructor).name,
+                    properties: {
+                        imageKey: object.imageKey,
+                        rotation: object.rotation,
+                        position: {
+                            x: object.position.x,
+                            y: object.position.y
+                        },
+                        collidable: object.collidable
+                    }
+                }
+
+                outputLevel.objectsData.push(data);
+            }
+
             console.log(JSON.stringify(outputLevel, null, 4));
         }
+    }
+
+    function onObjectSelected(e) {
+        var option = _objectSelector[_objectSelector.selectedIndex];
+        var image = _imageCache.getImageByKey(option.text);
+        _canvas.style.cursor = `url(resources/images/${option.value}) ${image.width / 2} ${image.height / 2}, auto`;
+        mode = 'object';
     }
 }

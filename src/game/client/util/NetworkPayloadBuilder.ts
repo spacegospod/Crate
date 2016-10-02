@@ -15,7 +15,7 @@ namespace Crate {
 
                 for (let i in objects) {
                     if (typeof objects[i] !== 'undefined') {
-                        payload.objects.push(this.buildObjectData(objects[i].object, objects[i].type));
+                        payload.objects.push(this.buildObjectData(objects[i].object));
                     }
                 }
 
@@ -34,7 +34,7 @@ namespace Crate {
             }
         }
 
-        private buildObjectData(object:BasicObject, type:string='BasicObject') {
+        private buildObjectData(object:BasicObject) {
             return {
                 uid: object.uid,
                 position: {
@@ -50,7 +50,7 @@ namespace Crate {
                     motionBlur: object.gfx.motionBlur.enabled,
                     blood: object.gfx.blood.enabled
                 },
-                type: type
+                type: (<any> object.constructor).name
             }
         }
 
