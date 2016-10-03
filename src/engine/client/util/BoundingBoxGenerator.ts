@@ -2,6 +2,8 @@ namespace Crate {
 
     /*
         Responsible for creating bounding boxes.
+        Pixel-perfect bounding boxes can be specified for each image,
+        see "bounding_boxes.json" in the "meta" directory.
     */
     export class BoundingBoxGenerator {
         private boundingBoxSpecs;

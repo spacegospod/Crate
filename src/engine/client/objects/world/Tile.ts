@@ -7,11 +7,8 @@ namespace Crate {
         // The position of the texture tile on the sprite
         textureIndex: Point;
 
-        blocking: boolean;
-
-        constructor(index=new Point(0, 0), blocking:boolean=false) {
+        constructor(index=new Point(0, 0)) {
             this.textureIndex = new Point(index.x, index.y);
-            this.blocking = blocking;
         }
     }
 }

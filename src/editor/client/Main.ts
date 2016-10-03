@@ -21,7 +21,7 @@ namespace Editor {
 
     var selectedObject: Crate.BasicObject;
 
-    export function init(canvas, context, imageMap, level:Crate.Level, socketIo) {
+    export function init(canvas, context, imageMap, level:Crate.Level, boundingBoxes, socketIo) {
         document.addEventListener('keypress', onKeyPress);
 
         _canvas = canvas;
@@ -50,7 +50,7 @@ namespace Editor {
         _game.scene.add(_god);
         _viewPort.centerOn(_god);
 
-        _game.init(_imageMap, [], [], context, _viewPort, level);
+        _game.init(_imageMap, [], boundingBoxes, context, _viewPort, level);
 
         _game.begin([processKeys], []);
     }

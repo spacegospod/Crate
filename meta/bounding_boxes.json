@@ -4,5 +4,11 @@
         "bottom": 30,
         "left": 22,
         "right": 5
+    },
+    "car-green": {
+        "top": 15,
+        "bottom": 16,
+        "left": 50,
+        "right": 48
     }
 }

@@ -31,6 +31,11 @@ namespace Crate {
 
         // draw the scene
         draw() {
+            // Debug code
+            var paramsIndex = window.location.href.indexOf('?');
+            if (paramsIndex > 0) {
+                var params = window.location.href.substring(paramsIndex + 1).split('&');
+            }
             // Clean up previous frame. Not needed if the next fillRect call is present
             // this.context.clearRect(0, 0, this.viewPort.width, this.viewPort.height);
 
@@ -63,37 +68,38 @@ namespace Crate {
                     }
 
                     this.drawGfx(image, object);
-                    /*
-                    UNCOMMENT TO DRAW BOUNDING BOXES
-                    if (object.boundingBox !== undefined) {
-                        var a = object.boundingBox.vertices;
-                        var v = [];
-                        for (var i in a) {
-                            v.push(this.viewPort.translateInViewport(a[i]));
+                    
+                    // Debug code
+                    if (params && params.indexOf('drawBoundingBoxes') >= 0) {
+                        if (object.boundingBox !== undefined) {
+                            var a = object.boundingBox.vertices;
+                            var v = [];
+                            for (var i in a) {
+                                v.push(this.viewPort.translateInViewport(a[i]));
+                            }
+                            this.context.strokeStyle = "#33ff33";
+
+                            this.context.beginPath();
+                            this.context.moveTo(v[0].x, v[0].y);
+                            this.context.lineTo(v[1].x, v[1].y);
+                            this.context.stroke();
+
+                            this.context.beginPath();
+                            this.context.moveTo(v[1].x, v[1].y);
+                            this.context.lineTo(v[2].x, v[2].y);
+                            this.context.stroke();
+
+                            this.context.beginPath();
+                            this.context.moveTo(v[2].x, v[2].y);
+                            this.context.lineTo(v[3].x, v[3].y);
+                            this.context.stroke();
+
+                            this.context.beginPath();
+                            this.context.moveTo(v[3].x, v[3].y);
+                            this.context.lineTo(v[0].x, v[0].y);
+                            this.context.stroke();
                         }
-                        this.context.strokeStyle = "#33ff33";
-
-                        this.context.beginPath();
-                        this.context.moveTo(v[0].x, v[0].y);
-                        this.context.lineTo(v[1].x, v[1].y);
-                        this.context.stroke();
-
-                        this.context.beginPath();
-                        this.context.moveTo(v[1].x, v[1].y);
-                        this.context.lineTo(v[2].x, v[2].y);
-                        this.context.stroke();
-
-                        this.context.beginPath();
-                        this.context.moveTo(v[2].x, v[2].y);
-                        this.context.lineTo(v[3].x, v[3].y);
-                        this.context.stroke();
-
-                        this.context.beginPath();
-                        this.context.moveTo(v[3].x, v[3].y);
-                        this.context.lineTo(v[0].x, v[0].y);
-                        this.context.stroke();
                     }
-                    */
                 }
             }
 

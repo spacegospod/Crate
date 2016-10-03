@@ -57,7 +57,8 @@
                 // get resource maps
                 Promise.all([
                     getResourcePromise('/meta/image_map.json'),
-                    getResourcePromise('/resources/level.json')])
+                    getResourcePromise('/resources/level.json'),
+                    getResourcePromise('/meta/bounding_boxes.json')])
                 .then(function(resources) {
                     var canvas = document.getElementById('canvas');
                     var context = canvas.getContext('2d');
@@ -72,7 +73,9 @@
                         var level = resources[1]
                             ? levelParser.parse(resources[1])
                             : new Crate.Level(new Crate.Map(32, 32), [], []);
-                        Editor.init(canvas, context, imageMap, level, io.connect());
+
+                        var boundingBoxes = JSON.parse(resources[2]);
+                        Editor.init(canvas, context, imageMap, level, boundingBoxes, io.connect());
                     } catch(e) {
                         console.error('Error while loading editor data: ' + (e || e.message));
                     }
