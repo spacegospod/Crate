@@ -23,6 +23,9 @@ namespace Crate {
         // All graphical effects available for the object
         gfx: GFX;
 
+        // All sound effects available for the object
+        sfx: SFX;
+
         // Opacity of the object's image. Unlikely to vary often, so it's not a parameter
         // of the constructor.
         opacity: number = 1.0;
@@ -43,6 +46,7 @@ namespace Crate {
                 collidable = false) {
             this.imageKey = imageKey;
             this.gfx = new GFX();
+            this.sfx = new SFX();
             this.position = (position === undefined) ? new Point(0, 0) : position;
             this.rotation = rotation;
             this.zIndex = zIndex;

@@ -7,6 +7,7 @@ namespace Crate {
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
     var impacts = [];
+    var triggeredSounds = [];
 
     var serverPushQueue = [];
 
@@ -125,6 +126,7 @@ namespace Crate {
         firedProjectiles = [];
         impacts = [];
         serverPushQueue = [];
+        triggeredSounds = [];
         // temporary
         player.health = Math.min(Player.MAX_HEALTH, player.health + (1 * environment.delta.getDelta()));
     }
@@ -143,6 +145,22 @@ namespace Crate {
         if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
             (<DynamicObject>player.object).direction = movementVector;
             (<DynamicObject>player.object).speed = Soldier.SPEED;
+
+            if (player.object.sfx.onMove.sounds.length > 0 && player.object.sfx.onMove.isReady) {
+                triggeredSounds.push({
+                    soundId: player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)],
+                    origin: {
+                        x: player.object.position.x,
+                        y: player.object.position.y
+                    },
+                    maxRange: 1000
+                });
+
+                player.object.sfx.onMove.isReady = false;
+                setTimeout(function() {
+                    player.object.sfx.onMove.isReady = true;
+                }, 330);
+            }
         }
 
         if (!player.weapon.isReloading() && inputController.isKeyPressed('R')) {
@@ -170,6 +188,7 @@ namespace Crate {
                     objects,
                     firedProjectiles,
                     impacts,
+                    triggeredSounds,
                     game.serverTimeOffset));
         } catch(e) {
             console.error(e || e.message);
@@ -208,18 +227,22 @@ namespace Crate {
         var projectiles = [];
         var impacts = [];
         var objectsToRemove = [];
+        var soundsToTrigger = [];
 
         for (var i in serverPushQueue) {
             objects.push.apply(objects, serverPushQueue[i].objects);
             projectiles.push.apply(projectiles, serverPushQueue[i].projectiles);
             impacts.push.apply(impacts, serverPushQueue[i].impacts);
             objectsToRemove.push.apply(objectsToRemove, serverPushQueue[i].objectsToRemove);
+            soundsToTrigger.push.apply(soundsToTrigger, serverPushQueue[i].triggeredSounds);
         }
 
         updateObjects(objects);
         updateProjectiles(projectiles);
         updateImpacts(impacts);
         updateObjectsToRemove(objectsToRemove);
+
+        playSounds(soundsToTrigger);
     }
 
     function onPlayerDisconnected(data) {
@@ -394,6 +417,15 @@ namespace Crate {
 
         updateProperties(newObject, data);
         return newObject;
+    }
+
+    function playSounds(data) {
+        for (var i in data) {
+            var soundData = data[i];
+            var distance:number = VU.length(VU.createVector(player.object.position, soundData.origin));
+            var volume:number = (soundData.maxRange - distance) / soundData.maxRange;
+            game.triggerEvent(EVENTS.AUDIO, {soundId: soundData.soundId, volume: volume});
+        }
     }
 
     /*------ Misc functions ------*/

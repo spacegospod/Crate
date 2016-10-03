@@ -19,6 +19,18 @@ namespace Crate {
                 direction,
                 speed);
             this.gfx.blood.enabled = true;
+            this.initSfx();
+        }
+
+        private initSfx() {
+            this.sfx.onMove.sounds.push('steps1');
+            this.sfx.onMove.sounds.push('steps2');
+            this.sfx.onMove.sounds.push('steps3');
+            this.sfx.onMove.sounds.push('steps4');
+
+            this.sfx.onHit.sounds.push('flesh1');
+            this.sfx.onHit.sounds.push('flesh2');
+            this.sfx.onHit.sounds.push('flesh3');
         }
     }
 }

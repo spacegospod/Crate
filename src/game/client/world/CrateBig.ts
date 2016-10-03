@@ -8,6 +8,13 @@ namespace Crate {
                 rotation,
                 1,
                 true);
+            this.initSfx();
+        }
+
+        private initSfx() {
+            this.sfx.onHit.sounds.push('wood1');
+            this.sfx.onHit.sounds.push('wood2');
+            this.sfx.onHit.sounds.push('wood3');
         }
     }
 }

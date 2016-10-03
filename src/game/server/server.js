@@ -64,6 +64,7 @@ function buildPushData() {
         objects: [],
         projectiles: [],
         impacts: [],
+        triggeredSounds: [],
         objectsToRemove: []
     };
 
@@ -114,6 +115,7 @@ function buildPushData() {
             data.objects.push.apply(data.objects, clientData.objects);
             data.projectiles.push.apply(data.projectiles, clientData.projectiles);
             data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
+            data.triggeredSounds.push.apply(data.triggeredSounds, clientData.triggeredSounds);
         } catch (e) {
             console.log(e);
         }

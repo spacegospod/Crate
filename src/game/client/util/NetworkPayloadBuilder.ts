@@ -5,12 +5,13 @@ namespace Crate {
         Constructs data objects representing the client's state.
     */
     export class NetworkPayloadBuilder {
-        build(objects, projectiles:Projectile[], impacts, serverTimeOffset:number) {
+        build(objects, projectiles:Projectile[], impacts, triggeredSounds, serverTimeOffset:number) {
             try {
                 var payload = {
                     objects: [],
                     projectiles: [],
-                    impacts: []
+                    impacts: [],
+                    triggeredSounds: []
                 };
 
                 for (let i in objects) {
@@ -26,6 +27,11 @@ namespace Crate {
                 for (let i in impacts) {
                     // directly serializeable
                     payload.impacts = impacts;
+                }
+
+                for (let i in triggeredSounds) {
+                    // directly serializeable
+                    payload.triggeredSounds = triggeredSounds;
                 }
 
                 return payload;

@@ -14,7 +14,7 @@ namespace Crate {
 
             for (var i in sceneObjects) {
                 var object:DynamicObject = sceneObjects[i];
-                if (!(object instanceof DynamicObject)) {
+                if (!(object instanceof DynamicObject) || Math.floor((<DynamicObject> object).speed) === 0) {
                     continue;
                 }
 

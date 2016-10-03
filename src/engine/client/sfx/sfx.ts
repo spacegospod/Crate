@@ -5,12 +5,18 @@ namespace Crate {
     */
     export class SFX  {
         // Arrays of sound IDs
-        onMove: String[];
-        onHit: String[];
+        onMove;
+        onHit;
 
         constructor() {
-            this.onMove = [];
-            this.onHit = [];
+            this.onMove = {
+                isReady: true,
+                sounds: []
+            };
+            this.onHit = {
+                isReady: true,
+                sounds: []
+            };
         }
     }
 }
