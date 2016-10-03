@@ -119,6 +119,9 @@ function buildPushData() {
         } catch (e) {
             console.log(e);
         }
+
+        // clear data
+        clientsData[j] = {};
     }
 
     // filter out the objects which will be removed

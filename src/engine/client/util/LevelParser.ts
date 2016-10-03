@@ -89,7 +89,7 @@ namespace Crate {
                     return this.createDynamicObject(data.properties);
                 }
                 default: {
-                    var customBuilder = this.customObjectsBuilders[data.type];
+                    var customBuilder = this.customObjectsBuilders[data.type.toLowerCase()];
                     if (customBuilder) {
                         return this.buildCustomObject(customBuilder, data.properties);
                     } else {

@@ -66,9 +66,7 @@
                         var imageMap = JSON.parse(resources[0]);
 
                         var levelParser = new Crate.LevelParser();
-                        levelParser.registerCustomObject('Soldier', function(data) {
-                            return new Crate.Soldier();
-                        });
+                        registerCustomObjects(levelParser);
 
                         var level = resources[1]
                             ? levelParser.parse(resources[1])
@@ -99,6 +97,42 @@
                         }
                     }
                     req.send();
+                });
+            }
+
+            function registerCustomObjects(parser) {
+                parser.registerCustomObject('Soldier', function(data) {
+                    return new Crate.Soldier();
+                });
+                parser.registerCustomObject('BloodStain', function(data) {
+                    return new Crate.BloodStain();
+                });
+                parser.registerCustomObject('CarGreen', function(data) {
+                    return new Crate.CarGreen();
+                });
+                parser.registerCustomObject('CrateBig', function(data) {
+                    return new Crate.CrateBig();
+                });
+                parser.registerCustomObject('CrateGreen', function(data) {
+                    return new Crate.CrateGreen();
+                });
+                parser.registerCustomObject('Foliage1', function(data) {
+                    return new Crate.Foliage1();
+                });
+                parser.registerCustomObject('Foliage2', function(data) {
+                    return new Crate.Foliage2();
+                });
+                parser.registerCustomObject('Foliage3', function(data) {
+                    return new Crate.Foliage3();
+                });
+                parser.registerCustomObject('Plant1', function(data) {
+                    return new Crate.Plant1();
+                });
+                parser.registerCustomObject('Plant2', function(data) {
+                    return new Crate.Plant2();
+                });
+                parser.registerCustomObject('Plant3', function(data) {
+                    return new Crate.Plant3();
                 });
             }
 

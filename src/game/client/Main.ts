@@ -21,9 +21,8 @@ namespace Crate {
         _canvas = canvas;
         game = new Game(canvas, io);
         var levelParser = new LevelParser();
-        levelParser.registerCustomObject('Soldier', function(data) {
-            return new Soldier();
-        });
+        registerCustomObjects(levelParser);
+        
         var level = levelParser.parse(levelData);
 
         viewPort = new ViewPort(canvas.width, canvas.height);
@@ -97,6 +96,17 @@ namespace Crate {
                     });
                     projectiles.splice(projectiles.indexOf(projectile), 1);
                     game.scene.remove(projectile.object);
+
+                    if (object.sfx.onHit.sounds.length > 0) {
+                        triggeredSounds.push({
+                            soundId: object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)],
+                            origin: {
+                                x: object.position.x,
+                                y: object.position.y
+                            },
+                            maxRange: 1000
+                        });
+                    }
                     return;
                 }
             }
@@ -159,12 +169,16 @@ namespace Crate {
                 player.object.sfx.onMove.isReady = false;
                 setTimeout(function() {
                     player.object.sfx.onMove.isReady = true;
-                }, 330);
+                }, 450);
             }
         }
 
         if (!player.weapon.isReloading() && inputController.isKeyPressed('R')) {
             player.weapon.reload();
+            game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipOutSoundId, volume: 1});
+            setTimeout(function() {
+                game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipInSoundId, volume: 1});
+            }, player.weapon.reloadTime - 200);
         }
     }
 
@@ -466,5 +480,41 @@ namespace Crate {
         }
 
         return true;
+    }
+
+    function registerCustomObjects(parser:LevelParser) {
+        parser.registerCustomObject('Soldier', function(data) {
+            return new Soldier();
+        });
+        parser.registerCustomObject('BloodStain', function(data) {
+            return new BloodStain();
+        });
+        parser.registerCustomObject('CarGreen', function(data) {
+            return new CarGreen();
+        });
+        parser.registerCustomObject('CrateBig', function(data) {
+            return new CrateBig();
+        });
+        parser.registerCustomObject('CrateGreen', function(data) {
+            return new CrateGreen();
+        });
+        parser.registerCustomObject('Foliage1', function(data) {
+            return new Foliage1();
+        });
+        parser.registerCustomObject('Foliage2', function(data) {
+            return new Foliage2();
+        });
+        parser.registerCustomObject('Foliage3', function(data) {
+            return new Foliage3();
+        });
+        parser.registerCustomObject('Plant1', function(data) {
+            return new Plant1();
+        });
+        parser.registerCustomObject('Plant2', function(data) {
+            return new Plant2();
+        });
+        parser.registerCustomObject('Plant3', function(data) {
+            return new Plant3();
+        });
     }
 }
