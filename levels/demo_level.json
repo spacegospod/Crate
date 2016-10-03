@@ -30,8 +30,7 @@
         }, {
             "x": 898,
             "y": 666
-        }
-    ],
+        }],
     "mapData": {
         "width": 32,
         "height": 32,
@@ -4205,17 +4204,43 @@
                 "imageKey": "invisible",
                 "rotation": 0,
                 "position": {
-                    "x": 519.8178059259133,
-                    "y": 767.8918025952526
+                    "x": 586.0289173204569,
+                    "y": 633.0828847646185
                 },
                 "collidable": false,
                 "zIndex": 0
             }
         },
         {
-            "type": "CrateBig",
+            "type": "CrateGreen",
             "properties": {
-                "imageKey": "crate",
+                "imageKey": "crate-green",
+                "rotation": "99",
+                "position": {
+                    "x": 198.45567081236038,
+                    "y": 99.22606025048202
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CrateGreen",
+            "properties": {
+                "imageKey": "crate-green",
+                "rotation": "-20",
+                "position": {
+                    "x": 863.3259735953048,
+                    "y": 811.4001435749996
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CrateOriginal",
+            "properties": {
+                "imageKey": "crate-original",
                 "rotation": 63,
                 "position": {
                     "x": 500,
@@ -4226,9 +4251,9 @@
             }
         },
         {
-            "type": "CrateBig",
+            "type": "CrateOriginal",
             "properties": {
-                "imageKey": "crate",
+                "imageKey": "crate-original",
                 "rotation": 30,
                 "position": {
                     "x": 615,
@@ -4239,39 +4264,13 @@
             }
         },
         {
-            "type": "CrateBig",
+            "type": "CrateOriginal",
             "properties": {
-                "imageKey": "crate",
+                "imageKey": "crate-original",
                 "rotation": 10,
                 "position": {
                     "x": 333,
                     "y": 333
-                },
-                "collidable": true,
-                "zIndex": 1
-            }
-        },
-        {
-            "type": "CrateGreen",
-            "properties": {
-                "imageKey": "crate",
-                "rotation": -15,
-                "position": {
-                    "x": 700,
-                    "y": 100
-                },
-                "collidable": true,
-                "zIndex": 1
-            }
-        },
-        {
-            "type": "CrateGreen",
-            "properties": {
-                "imageKey": "crate",
-                "rotation": -15,
-                "position": {
-                    "x": 780,
-                    "y": 500
                 },
                 "collidable": true,
                 "zIndex": 1
@@ -4307,13 +4306,234 @@
             "type": "CrateGreen",
             "properties": {
                 "imageKey": "crate-green",
-                "rotation": "-20",
+                "rotation": -15,
                 "position": {
-                    "x": 863.3259735953048,
-                    "y": 811.4001435749996
+                    "x": 700,
+                    "y": 100
                 },
                 "collidable": true,
                 "zIndex": 1
+            }
+        },
+        {
+            "type": "CrateGreen",
+            "properties": {
+                "imageKey": "crate-green",
+                "rotation": "-35",
+                "position": {
+                    "x": 780,
+                    "y": 500
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CarGreen",
+            "properties": {
+                "imageKey": "car-green",
+                "rotation": "-44",
+                "position": {
+                    "x": 638.5150355111165,
+                    "y": 327.31503551111615
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "Plant2",
+            "properties": {
+                "imageKey": "plant-2",
+                "rotation": "10",
+                "position": {
+                    "x": 163.7150355111164,
+                    "y": 223.31503551111615
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant1",
+            "properties": {
+                "imageKey": "plant-1",
+                "rotation": 0,
+                "position": {
+                    "x": 658.8078779685014,
+                    "y": 486.06121164195406
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant1",
+            "properties": {
+                "imageKey": "plant-1",
+                "rotation": "45",
+                "position": {
+                    "x": 132.0236933762173,
+                    "y": 44.245396234237916
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant1",
+            "properties": {
+                "imageKey": "plant-1",
+                "rotation": "33",
+                "position": {
+                    "x": 156.0236933762173,
+                    "y": 551.0453962342382
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant2",
+            "properties": {
+                "imageKey": "plant-2",
+                "rotation": "-9",
+                "position": {
+                    "x": 230.7150355111164,
+                    "y": 142.31503551111615
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant2",
+            "properties": {
+                "imageKey": "plant-2",
+                "rotation": "-12",
+                "position": {
+                    "x": 908.3059443701262,
+                    "y": 200.73353467845118
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant1",
+            "properties": {
+                "imageKey": "plant-1",
+                "rotation": "66",
+                "position": {
+                    "x": 951.551197029365,
+                    "y": 752.3215864674869
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Foliage1",
+            "properties": {
+                "imageKey": "foliage-1",
+                "rotation": 0,
+                "position": {
+                    "x": 501.85128368454275,
+                    "y": 851.2529573173848
+                },
+                "collidable": false,
+                "zIndex": 101
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": "-75",
+                "position": {
+                    "x": 164.85128368454275,
+                    "y": 700.2529573173848
+                },
+                "collidable": false,
+                "zIndex": 102
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": "66",
+                "position": {
+                    "x": 832.3040974269284,
+                    "y": 592.2001435749994
+                },
+                "collidable": false,
+                "zIndex": 102
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": "-28",
+                "position": {
+                    "x": 929.1717164502533,
+                    "y": 850.4677625983243
+                },
+                "collidable": false,
+                "zIndex": 102
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": 0,
+                "position": {
+                    "x": 531.1178925810909,
+                    "y": 852.9863484208367
+                },
+                "collidable": false,
+                "zIndex": 102
+            }
+        },
+        {
+            "type": "Foliage2",
+            "properties": {
+                "imageKey": "foliage-2",
+                "rotation": 0,
+                "position": {
+                    "x": 442.85128368454275,
+                    "y": 899.2529573173848
+                },
+                "collidable": false,
+                "zIndex": 103
+            }
+        },
+        {
+            "type": "Tree1",
+            "properties": {
+                "imageKey": "tree-1",
+                "rotation": 0,
+                "position": {
+                    "x": 631.5150355111165,
+                    "y": 247.31503551111615
+                },
+                "collidable": false,
+                "zIndex": 200
+            }
+        },
+        {
+            "type": "Tree1",
+            "properties": {
+                "imageKey": "tree-1",
+                "rotation": "-77",
+                "position": {
+                    "x": 180.71503551111635,
+                    "y": 190.31503551111615
+                },
+                "collidable": false,
+                "zIndex": 200
             }
         }
     ]

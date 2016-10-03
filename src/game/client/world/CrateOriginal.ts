@@ -1,9 +1,9 @@
 ///<reference path='../../../../repo/engine-client.ts'/>
 namespace Crate {
 
-    export class CrateBig extends BasicObject {
+    export class CrateOriginal extends BasicObject {
         constructor(position:Point = new Point(0, 0), rotation:number = 0) {
-            super('crate',
+            super('crate-original',
                 position,
                 rotation,
                 1,

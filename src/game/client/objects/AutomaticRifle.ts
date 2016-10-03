@@ -18,6 +18,8 @@ namespace Crate {
         private _isReloading: boolean;
         private _recoilFactor: number;
 
+        private _maxRecoilAngle: number;
+
         constructor() {
             this.fireInterval = 100;
             this.reloadTime = 5 * 1000;
@@ -32,6 +34,8 @@ namespace Crate {
             this._isReloading = false;
             this._isReadyToFire = true;
             this.isAutomatic = true;
+
+            this._maxRecoilAngle = 30;
 
             this.reduceRecoil();
         }
@@ -74,8 +78,8 @@ namespace Crate {
             var recoilDirection = Math.random() > 0.5;
             
             var recoilAngle = recoilDirection
-                    ? 15 * this._recoilFactor * Math.random()
-                    : -15 * this._recoilFactor * Math.random();
+                    ? this._maxRecoilAngle * this._recoilFactor * Math.random()
+                    : this._maxRecoilAngle * this._recoilFactor * Math.random();
 
             this._recoilFactor = Math.min(1, this._recoilFactor + 0.070);
 

@@ -1,7 +1,7 @@
 {
     "blood": "blood.png",
     "bullet": "bullet.png",
-    "crate": "crate.png",
+    "crate-original": "crate_original.png",
     "soldier": "soldier.png",
     "texture-default": "default_texture.png",
     "texture-sprite": "textures.png",
@@ -13,5 +13,6 @@
     "plant-1": "plant_1.png",
     "plant-2": "plant_2.png",
     "plant-3": "plant_3.png",
+    "tree-1": "tree_1.png",
     "car-green": "car_green.png"
 }

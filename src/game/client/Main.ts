@@ -492,8 +492,8 @@ namespace Crate {
         parser.registerCustomObject('CarGreen', function(data) {
             return new CarGreen();
         });
-        parser.registerCustomObject('CrateBig', function(data) {
-            return new CrateBig();
+        parser.registerCustomObject('CrateOriginal', function(data) {
+            return new CrateOriginal();
         });
         parser.registerCustomObject('CrateGreen', function(data) {
             return new CrateGreen();
@@ -515,6 +515,9 @@ namespace Crate {
         });
         parser.registerCustomObject('Plant3', function(data) {
             return new Plant3();
+        });
+        parser.registerCustomObject('Tree1', function(data) {
+            return new Tree1();
         });
     }
 }
