@@ -176,8 +176,8 @@ namespace Crate {
                             tile.textureIndex.y * Tile.TILE_HEIGHT,
                             Tile.TILE_WIDTH,
                             Tile.TILE_HEIGHT,
-                            location.x,
-                            location.y,
+                            Math.floor(location.x),
+                            Math.floor(location.y),
                             Tile.TILE_WIDTH,
                             Tile.TILE_HEIGHT);
                     }

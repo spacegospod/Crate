@@ -68,5 +68,10 @@ namespace Crate {
 
             return directionVector.x > 0 ? 360 - angle : angle;
         }
+
+        isKeyPressed(key) {
+            var charCode = key.charCodeAt(0);
+            return this._inputRegistry.getKeyStatus(charCode);
+        }
     }
 }

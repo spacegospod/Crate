@@ -89,6 +89,7 @@ gulp.task('game-server', function() {
 gulp.task('game-client', function() {
     return gulp.src(['repo/engine-client.ts',
         'src/game/client/util/**/*.ts',
+        'src/game/client/world/**/*.ts',
         'src/game/client/objects/**/*.ts',
         'src/game/client/Main.ts'])
         .pipe(ts({
@@ -109,6 +110,7 @@ gulp.task('game-client', function() {
 gulp.task('game-client-debug', function() {
     return gulp.src(['repo/engine-client.ts',
         'src/game/client/util/**/*.ts',
+        'src/game/client/world/**/*.ts',
         'src/game/client/objects/**/*.ts',
         'src/game/client/Main.ts'])
         .pipe(ts({

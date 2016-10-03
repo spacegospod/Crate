@@ -144,8 +144,12 @@ function disconnectPlayer(socket) {
 }
 
 io.sockets.on('connection', function(socket) {
+    clientsData[socket.id] = {};
+
     socket.on('clientUpdate', function(data) {
-        clientsData[socket.id] = data;
+        if (typeof clientsData[socket.id] !== 'undefined') {
+            clientsData[socket.id] = data;
+        }
     });
     socket.on('playerDied', function(data) {
         deadPlayersData.push({

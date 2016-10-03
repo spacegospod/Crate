@@ -23,6 +23,42 @@
                 },
                 "collidable": true
             }
+        },
+        {
+            "type": "BasicObject",
+            "properties": {
+                "imageKey": "crate",
+                "rotation": 10,
+                "position": {
+                    "x": 333,
+                    "y": 333
+                },
+                "collidable": true
+            }
+        },
+        {
+            "type": "BasicObject",
+            "properties": {
+                "imageKey": "crate",
+                "rotation": -15,
+                "position": {
+                    "x": 700,
+                    "y": 100
+                },
+                "collidable": true
+            }
+        },
+        {
+            "type": "BasicObject",
+            "properties": {
+                "imageKey": "crate",
+                "rotation": -15,
+                "position": {
+                    "x": 780,
+                    "y": 500
+                },
+                "collidable": true
+            }
         }
     ],
     "mapData": {

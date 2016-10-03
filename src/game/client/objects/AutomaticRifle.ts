@@ -4,6 +4,8 @@ namespace Crate {
     export class AutomaticRifle implements IWeapon {
         fireInterval: number;
         reloadTime: number;
+        magazineAmmo: number;
+        remainingAmmo: number;
         damageMin: number;
         damageMax: number;
         soundId: string;
@@ -11,15 +13,19 @@ namespace Crate {
         isAutomatic: boolean;
 
         private _isReadyToFire: boolean;
+        private _isReloading: boolean;
         private _recoilFactor: number;
 
         constructor() {
             this.fireInterval = 100;
             this.reloadTime = 5 * 1000;
+            this.magazineAmmo = 30;
+            this.remainingAmmo = 90;
             this.damageMin = 4;
             this.damageMax = 9;
             this._recoilFactor = 0;
             this.soundId = 'fire';
+            this._isReloading = false;
             this._isReadyToFire = true;
             this.isAutomatic = true;
 
@@ -27,17 +33,30 @@ namespace Crate {
         }
 
         reload() {
+            this._isReloading = true;
             setTimeout(() => {
+                this.remainingAmmo -= (30 - this.magazineAmmo);
+                var newAmmo = 30;
+                if (this.remainingAmmo < 0) {
+                    newAmmo += this.remainingAmmo;
+                    this.remainingAmmo = 0;
+                }
+                this.magazineAmmo = newAmmo;
+                this._isReloading = false;
                 this._isReadyToFire = true;
             }, this.reloadTime);
         }
 
-        isReadyToFire() {
+        isReloading():boolean {
+            return this._isReloading;
+        }
+
+        isReadyToFire():boolean {
             return this._isReadyToFire;
         }
 
         fire(origin:Point, direction:Vector):Projectile {
-            if (!this.isReadyToFire) {
+            if (!this._isReadyToFire || this._isReloading || this.magazineAmmo <= 0) {
                 return undefined;
             }
 
@@ -57,6 +76,8 @@ namespace Crate {
             this._recoilFactor = Math.min(1, this._recoilFactor + 0.070);
 
             var damage: number = Math.random() * (this.damageMax - this.damageMin) + this.damageMin;
+
+            this.magazineAmmo--;
 
             return new Bullet(origin, VU.rotateVector(direction, recoilAngle), damage);
         }

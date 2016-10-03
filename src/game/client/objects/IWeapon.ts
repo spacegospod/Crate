@@ -6,6 +6,12 @@ namespace Crate {
         fireInterval: number;
         // in milliseconds
         reloadTime: number;
+
+        // current ammo (in magazine)
+        magazineAmmo: number;
+        // ammo available when reloading
+        remainingAmmo: number;
+
         damageMin: number;
         damageMax: number;
         // whether the weapon is currently firing. Should be used along with
@@ -17,6 +23,8 @@ namespace Crate {
         soundId: string;
 
         reload();
+
+        isReloading();
 
         isReadyToFire();
 

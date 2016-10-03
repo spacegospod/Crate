@@ -111,7 +111,10 @@ namespace Crate {
         context.font = '20px Impact';
         context.fillStyle = '#ffff00';
         context.globalAlpha = 0.7;
+
         context.fillText('HEALTH: ' + Math.floor(player.health), 25, viewPort.height - 20);
+        context.fillText('AMMO: ' + Math.floor(player.weapon.magazineAmmo) + ' / ' + Math.floor(player.weapon.remainingAmmo),
+            668, viewPort.height - 20);
 
         // reset globals
         context.fillStyle = originalFillStyle;
@@ -140,6 +143,10 @@ namespace Crate {
         if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
             (<DynamicObject>player.object).direction = movementVector;
             (<DynamicObject>player.object).speed = Soldier.SPEED;
+        }
+
+        if (!player.weapon.isReloading() && inputController.isKeyPressed('R')) {
+            player.weapon.reload();
         }
     }
 
@@ -187,6 +194,9 @@ namespace Crate {
         player.health = Player.MAX_HEALTH;
         player.isAlive = true;
 
+        player.weapon.remainingAmmo = 90;
+        player.weapon.magazineAmmo = 30;
+
         game.scene.remove(player.object);
         player.object = new Soldier(new Point(data.location.x, data.location.y), new Vector(0, 1));
         game.scene.add(player.object);
@@ -216,10 +226,11 @@ namespace Crate {
         for (let i in data) {
             for (let j in game.scene.objects) {
                 if (data[i].networkUid === game.scene.objects[j].networkUid) {
+                    var objectToRemove:BasicObject = game.scene.objects[j];
                     // The timeout is needed because the server might push some leftover updates
                     // and re-place the disconnected player on the scene
                     setTimeout(() => {
-                        game.scene.remove(game.scene.objects[j]);
+                        game.scene.remove(objectToRemove);
                     }, 5000);
                 }
             }
@@ -339,8 +350,9 @@ namespace Crate {
         for (var i in networkUids) {
             var networkUid = networkUids[i];
             for (var j in game.scene.objects) {
-                if (game.scene.objects[j].networkUid === networkUid) {
-                    objectsToRemove.push(game.scene.objects[j]);
+                var object:BasicObject = game.scene.objects[j];
+                if (object.networkUid === networkUid) {
+                    objectsToRemove.push(object);
                 }
             }
         }
@@ -392,7 +404,7 @@ namespace Crate {
 
         player.weapon.isFiring = true;
 
-        if (player.weapon.isReadyToFire) {
+        if (player.weapon.isReadyToFire() && !player.weapon.isReloading() && player.weapon.magazineAmmo > 0) {
             var projectile:Projectile = player.weapon.fire(
                     player.projectileOrigin,
                     player.projectileDirection);

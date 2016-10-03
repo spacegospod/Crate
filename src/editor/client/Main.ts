@@ -1,3 +1,4 @@
+///<reference path='ObjectConstructorMapper.ts'/>
 namespace Editor {
     /*------ Main editor file ------*/
     var _canvas: any;
@@ -101,8 +102,8 @@ namespace Editor {
         } else if (mode === 'object') {
             var option = _objectSelector[_objectSelector.selectedIndex];
 
-            var newObject:Crate.BasicObject = new Crate.BasicObject(option.text,
-                new Crate.Point(mapX, mapY));
+            var clazz = getObjectClass(option.text);
+            var newObject:Crate.BasicObject = new clazz(new Crate.Point(mapX, mapY));
             _game.scene.add(newObject);
             selectedObject = newObject;
             _rotationInput.value = selectedObject.rotation;
@@ -129,6 +130,10 @@ namespace Editor {
         } else if (event.keyCode === 111) {
             // O
             selectObject();
+        } else if (event.keyCode === 114) {
+            // R
+            selectObject();
+            removeObject();
         }
     }
 
@@ -212,5 +217,10 @@ namespace Editor {
                 return;
             }
         }
+    }
+
+    function removeObject() {
+        _game.scene.remove(selectedObject);
+        _rotationInput.value = 0;
     }
 }
