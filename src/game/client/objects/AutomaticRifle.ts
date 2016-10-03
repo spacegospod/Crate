@@ -25,8 +25,8 @@ namespace Crate {
             this.reloadTime = 5 * 1000;
             this.magazineAmmo = 30;
             this.remainingAmmo = 90;
-            this.damageMin = 4;
-            this.damageMax = 9;
+            this.damageMin = 9;
+            this.damageMax = 19;
             this._recoilFactor = 0;
             this.fireSoundId = 'm4a1';
             this.clipOutSoundId = "clipout";

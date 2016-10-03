@@ -173,7 +173,9 @@ namespace Crate {
             }
         }
 
-        if (!player.weapon.isReloading() && inputController.isKeyPressed('R')) {
+        if (inputController.isKeyPressed('R')
+                && !player.weapon.isReloading()
+                && !(player.weapon.remainingAmmo === 0)) {
             player.weapon.reload();
             game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipOutSoundId, volume: 1});
             setTimeout(function() {
