@@ -13,5 +13,15 @@
     "ricmetal1": "ricmetal1.wav",
     "ricmetal2": "ricmetal2.wav",
     "clipin": "w_clipin.wav",
-    "clipout": "w_clipout.wav"
+    "clipout": "w_clipout.wav",
+    "flesh1": "hit1.wav",
+    "flesh2": "hit2.wav",
+    "flesh3": "hit3.wav",
+    "steps1": "steps1.wav",
+    "steps2": "steps2.wav",
+    "steps3": "steps3.wav",
+    "steps4": "steps4.wav",
+    "wood1": "wood1.wav",
+    "wood2": "wood2.wav",
+    "wood3": "wood3.wav"
 }
