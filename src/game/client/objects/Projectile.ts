@@ -22,6 +22,8 @@ namespace Crate {
 
         private _damage: number;
 
+        soundId: string;
+
         constructor(origin:Point,
             direction:Vector,
             speed:number,

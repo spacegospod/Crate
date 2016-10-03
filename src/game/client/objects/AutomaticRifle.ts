@@ -8,7 +8,9 @@ namespace Crate {
         remainingAmmo: number;
         damageMin: number;
         damageMax: number;
-        soundId: string;
+        fireSoundId: string;
+        clipOutSoundId: string;
+        clipInSoundId: string;
         isFiring: boolean;
         isAutomatic: boolean;
 
@@ -24,7 +26,9 @@ namespace Crate {
             this.damageMin = 4;
             this.damageMax = 9;
             this._recoilFactor = 0;
-            this.soundId = 'fire';
+            this.fireSoundId = 'm4a1';
+            this.clipOutSoundId = "clipout";
+            this.clipInSoundId = "clipin";
             this._isReloading = false;
             this._isReadyToFire = true;
             this.isAutomatic = true;
@@ -79,7 +83,10 @@ namespace Crate {
 
             this.magazineAmmo--;
 
-            return new Bullet(origin, VU.rotateVector(direction, recoilAngle), damage);
+            var bullet:Bullet = new Bullet(origin, VU.rotateVector(direction, recoilAngle), damage);
+            bullet.soundId = this.fireSoundId;
+
+            return bullet;
         }
 
         private reduceRecoil() {

@@ -20,7 +20,11 @@ namespace Crate {
         // whether the weapon is automatic
         isAutomatic: boolean;
         // sound to play when fired
-        soundId: string;
+        fireSoundId: string;
+        // sound to play when removing clip
+        clipOutSoundId: string;
+        // sound to play when inserting clip
+        clipInSoundId: string;
 
         reload();
 

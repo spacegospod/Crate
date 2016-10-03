@@ -1,4 +1,17 @@
 {
-    "fire": "gun.mp3",
-    "reload": "reload.mp3"
+    "ak47": "ak47.wav",
+    "aug": "aug.wav",
+    "awp": "awp.wav",
+    "famas": "famas.wav",
+    "m4a1": "m4a1.wav",
+    "explode1": "explode1.wav",
+    "explode2": "explode2.wav",
+    "explode3": "explode3.wav",
+    "explode4": "explode4.wav",
+    "explode5": "explode5.wav",
+    "explode6": "explode6.wav",
+    "ricmetal1": "ricmetal1.wav",
+    "ricmetal2": "ricmetal2.wav",
+    "clipin": "w_clipin.wav",
+    "clipout": "w_clipout.wav"
 }
