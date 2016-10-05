@@ -11,21 +11,31 @@ namespace Crate {
 
         private _serverTimeOffset: number = 0;
 
+        private _socketId: string;
+
         private static REQUEST_TIMEOUT = 1 * 1000;
 
         constructor(io) {
             this._io = io;
-            this._io.on('serverTimeRes', (data)=>{this.onServerTimeResponse(data)});
-            setTimeout(()=>{this.requestServerTime()}, ConnectionMonitor.REQUEST_TIMEOUT);
+            this._io.on('serverTimeRes', (data) => { this.onServerTimeResponse(data); });
+            this._io.on('socketIdRes', (data) => { this._socketId = data.socketId; });
+
+            this._io.emit('socketIdReq');
+
+            setTimeout(() => { this.requestServerTime(); }, ConnectionMonitor.REQUEST_TIMEOUT);
         }
 
         get serverTimeOffset(): number {
             return this._serverTimeOffset;
         }
 
+        get socketId(): string {
+            return this._socketId;
+        }
+
         private requestServerTime() {
             this._io.emit('serverTimeReq', {sendTime: Date.now()});
-            setTimeout(()=>{this.requestServerTime()}, ConnectionMonitor.REQUEST_TIMEOUT);
+            setTimeout(() => { this.requestServerTime(); }, ConnectionMonitor.REQUEST_TIMEOUT);
         }
 
         private onServerTimeResponse(data) {

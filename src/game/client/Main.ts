@@ -98,8 +98,14 @@ namespace Crate {
                     game.scene.remove(projectile.object);
 
                     if (object.sfx.onHit.sounds.length > 0) {
+                        var soundId = object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)];
+                        var distance:number = VU.length(VU.createVector(player.object.position, object.position));
+                        var volume:number = (2500 - distance) / 2500;
+
+                        game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
+
                         triggeredSounds.push({
-                            soundId: object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)],
+                            soundId: soundId,
                             origin: {
                                 x: object.position.x,
                                 y: object.position.y
@@ -157,8 +163,12 @@ namespace Crate {
             (<DynamicObject>player.object).speed = Soldier.SPEED;
 
             if (player.object.sfx.onMove.sounds.length > 0 && player.object.sfx.onMove.isReady) {
+                var soundId = player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)];
+
+                game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
+
                 triggeredSounds.push({
-                    soundId: player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)],
+                    soundId: soundId,
                     origin: {
                         x: player.object.position.x,
                         y: player.object.position.y
@@ -169,7 +179,7 @@ namespace Crate {
                 player.object.sfx.onMove.isReady = false;
                 setTimeout(function() {
                     player.object.sfx.onMove.isReady = true;
-                }, 450);
+                }, 400);
             }
         }
 
@@ -205,7 +215,7 @@ namespace Crate {
                     firedProjectiles,
                     impacts,
                     triggeredSounds,
-                    game.serverTimeOffset));
+                    game.connectionData.serverTimeOffset));
         } catch(e) {
             console.error(e || e.message);
         }
@@ -246,11 +256,18 @@ namespace Crate {
         var soundsToTrigger = [];
 
         for (var i in serverPushQueue) {
-            objects.push.apply(objects, serverPushQueue[i].objects);
-            projectiles.push.apply(projectiles, serverPushQueue[i].projectiles);
-            impacts.push.apply(impacts, serverPushQueue[i].impacts);
-            objectsToRemove.push.apply(objectsToRemove, serverPushQueue[i].objectsToRemove);
-            soundsToTrigger.push.apply(soundsToTrigger, serverPushQueue[i].triggeredSounds);
+            var pushData = serverPushQueue[i];
+            for (var j in pushData.clientUpdates) {
+                var update = pushData.clientUpdates[j];
+                if (update.clientSocketId !== game.connectionData.socketId) {
+                    objects.push.apply(objects, update.objects);
+                    projectiles.push.apply(projectiles, update.projectiles);
+                    soundsToTrigger.push.apply(soundsToTrigger, update.triggeredSounds);
+                }
+            }
+
+            impacts.push.apply(impacts, pushData.impacts);
+            objectsToRemove.push.apply(objectsToRemove, pushData.objectsToRemove);
         }
 
         updateObjects(objects);
@@ -280,7 +297,7 @@ namespace Crate {
         function updateObject(data) {
             for (let i in game.scene.objects) {
                 var object = game.scene.objects[i];
-                if (object.networkUid != data.networkUid) {
+                if (object && object.networkUid != data.networkUid) {
                     continue;
                 }
 
@@ -305,14 +322,14 @@ namespace Crate {
     function updateProjectiles(data) {
         for (let i in data) {
             var proj = data[i];
-            if (isNetworkUIDUnique(proj.object.networkUid)) {
+            if (proj && isNetworkUIDUnique(proj.object.networkUid)) {
                 var bullet = new Projectile(
                     new Point(proj.origin.x, proj.origin.y),
                     new Vector(proj.direction.x, proj.direction.y),
                     <number>proj.speed,
                     proj.damage,
                     createObject(proj.object),
-                    <number>proj.timestamp - game.serverTimeOffset);
+                    <number>proj.timestamp - game.connectionData.serverTimeOffset);
                 bullet.soundId = proj.soundId;
                 projectiles.push(bullet);
                 game.scene.add(bullet.object);

@@ -113,8 +113,11 @@ namespace Crate {
             return this._scene;
         }
 
-        get serverTimeOffset(): number {
-            return this._connectionMonitor.serverTimeOffset;
+        get connectionData(): any {
+            return {
+                serverTimeOffset: this._connectionMonitor.serverTimeOffset,
+                socketId: this._connectionMonitor.socketId
+            };
         }
 
         private loop() {

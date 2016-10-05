@@ -26,14 +26,14 @@ var clientsData = {};
 var registeredImpacts = [];
 
 function respawnDeadPlayers() {
-    function respawnPlayer(socketId) {
+    function respawnPlayer(socket) {
         var location = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        io.to(socketId).emit('spawnPlayer', {location: location});
+        socket.emit('spawnPlayer', {location: location});
     }
 
     for (var deadPlayerInfo in deadPlayersData) {
         var info = deadPlayersData[deadPlayerInfo];
-        respawnPlayer(info.socket.id);
+        respawnPlayer(info.socket);
     }
 
     deadPlayersData = [];
@@ -59,75 +59,92 @@ function clearImpacts() {
     registeredImpacts = relevantImpacts;
 }
 
-function buildPushData() {
-    var data = {
-        objects: [],
-        projectiles: [],
-        impacts: [],
-        triggeredSounds: [],
-        objectsToRemove: []
-    };
+// removes duplicate impact events
+function filterImpacts(impacts) {
 
-    // removes duplicate impact events
-    function filterImpacts(impacts) {
-
-        function isImpactUnique(impact) {
-            for (var j in registeredImpacts) {
-                if (impact.object === registeredImpacts[j].data.object
-                    && impact.projectile === registeredImpacts[j].data.projectile) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        var result = [];
-        for (var i in impacts) {
-            var impact = impacts[i];
-            if (isImpactUnique(impact)) {
-                result.push(impact);
-                registerImpact(impact);
+    function isImpactUnique(impact) {
+        for (var j in registeredImpacts) {
+            if (impact.object === registeredImpacts[j].data.object
+                && impact.projectile === registeredImpacts[j].data.projectile) {
+                return false;
             }
         }
 
-        return result;
+        return true;
     }
 
+    var result = [];
+    for (var i in impacts) {
+        var impact = impacts[i];
+        if (isImpactUnique(impact)) {
+            result.push(impact);
+            registerImpact(impact);
+        }
+    }
+
+    return result;
+}
+
+function getObjectsToRemove() {
+    var objsToRemove = [];
     for (var i in deadPlayersData) {
         var info = deadPlayersData[i];
         for (var j in info.data) {
             try {
-                data.objectsToRemove.push(info.data[j]);
+                objsToRemove.push(info.data[j]);
             } catch(e) {
                 console.log(e);
             }
         }
     }
 
-    for (var j in clientsData) {
-        var clientData = clientsData[j];
+    return objsToRemove;
+}
+
+function buildPushData() {
+    var data = {
+        impacts: [],
+        objectsToRemove: getObjectsToRemove(),
+        clientUpdates: []
+    };
+
+    for (var socketId in clientsData) {
+        var clientData = clientsData[socketId];
         if (typeof clientData === 'undefined') {
             continue;
         }
 
         try {
-            data.objects.push.apply(data.objects, clientData.objects);
-            data.projectiles.push.apply(data.projectiles, clientData.projectiles);
+            var clientUpdateItem = {
+                objects: [],
+                projectiles: [],
+                triggeredSounds: [],
+                clientSocketId: socketId
+            };
+
+            if (typeof clientData.objects !== 'undefined') {
+                var filteredObjects = clientData.objects.filter(function(object) {
+                    return data.objectsToRemove.indexOf(object.networkUid) < 0;
+                });
+
+                clientUpdateItem.objects = filteredObjects;
+            }
+
+            if (typeof clientData.projectiles !== 'undefined') {
+                clientUpdateItem.projectiles = clientData.projectiles;
+            }
+
+            if (typeof clientData.triggeredSounds !== 'undefined') {
+                clientUpdateItem.triggeredSounds = clientData.triggeredSounds;
+            }
+
+            data.clientUpdates.push(clientUpdateItem);
+
             data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
-            data.triggeredSounds.push.apply(data.triggeredSounds, clientData.triggeredSounds);
         } catch (e) {
             console.log(e);
         }
-
-        // clear data
-        clientsData[j] = {};
     }
-
-    // filter out the objects which will be removed
-    data.objects = data.objects.filter(function(object) {
-        return data.objectsToRemove.indexOf(object.networkUid) < 0;
-    });
 
     return data;
 }
@@ -142,6 +159,7 @@ function pushToClients() {
 function disconnectPlayer(socket) {
     try {
         io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+        console.log(socket.id + ' disconnected');
     } catch (e) {
         console.log('Failed to disconnect player');
     }
@@ -150,6 +168,7 @@ function disconnectPlayer(socket) {
 
 io.sockets.on('connection', function(socket) {
     clientsData[socket.id] = {};
+    console.log(socket.id + ' connected');
 
     socket.on('clientUpdate', function(data) {
         if (typeof clientsData[socket.id] !== 'undefined') {
@@ -170,8 +189,11 @@ io.sockets.on('connection', function(socket) {
     });
     // control event handlers
     socket.on('serverTimeReq', function(data) {
-        var payload = {sendTime: data.sendTime, serverTime: Date.now()};
+        var payload = { sendTime: data.sendTime, serverTime: Date.now() };
         socket.emit('serverTimeRes', payload);
+    });
+    socket.on('socketIdReq', function() {
+        socket.emit('socketIdRes', { socketId: socket.id });
     });
 });
 
