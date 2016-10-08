@@ -9,13 +9,12 @@ namespace Crate {
     var impacts = [];
     var triggeredSounds = [];
 
-    var serverPushQueue = [];
-
     // All projectiles fired during the current frame
     var firedProjectiles: Projectile[] = [];
 
     var networkPayloadBuilder: NetworkPayloadBuilder = new NetworkPayloadBuilder();
     var inputController: InputController;
+    var networkState: NetworkState;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -29,6 +28,8 @@ namespace Crate {
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
         inputController = new InputController(game.inputRegistry);
+
+        networkState = new NetworkState();
 
         player = new Player(new Soldier(new Point(0, 0), new Vector(1, 0)));
 
@@ -55,7 +56,7 @@ namespace Crate {
     }
 
     function attachNetworkHandlers() {
-        game.attachNetworkHandler('serverpush', onServerPush);
+        game.attachNetworkHandler('serverpush', (data) => { networkState.onServerPush(data); });
 
         game.attachNetworkHandler('spawnPlayer', onPlayerSpawned);
 
@@ -100,7 +101,7 @@ namespace Crate {
                     if (object.sfx.onHit.sounds.length > 0) {
                         var soundId = object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)];
                         var distance:number = VU.length(VU.createVector(player.object.position, object.position));
-                        var volume:number = (2500 - distance) / 2500;
+                        var volume:number = (1000 - distance) / 1000;
 
                         game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
 
@@ -139,9 +140,10 @@ namespace Crate {
     }
 
     function clearFrameState(environment) {
+        networkState.clear();
+
         firedProjectiles = [];
         impacts = [];
-        serverPushQueue = [];
         triggeredSounds = [];
         // temporary
         player.health = Math.min(Player.MAX_HEALTH, player.health + (1 * environment.delta.getDelta()));
@@ -179,7 +181,7 @@ namespace Crate {
                 player.object.sfx.onMove.isReady = false;
                 setTimeout(function() {
                     player.object.sfx.onMove.isReady = true;
-                }, 400);
+                }, 450);
             }
         }
 
@@ -231,10 +233,6 @@ namespace Crate {
             });
     }
 
-    function onServerPush(data) {
-        serverPushQueue.push(data);
-    }
-
     function onPlayerSpawned(data) {
         player.health = Player.MAX_HEALTH;
         player.isAlive = true;
@@ -249,33 +247,14 @@ namespace Crate {
     }
 
     function applyServerPushData() {
-        var objects = [];
-        var projectiles = [];
-        var impacts = [];
-        var objectsToRemove = [];
-        var soundsToTrigger = [];
+        var data = networkState.getServerPushData(game.connectionData.socketId);
 
-        for (var i in serverPushQueue) {
-            var pushData = serverPushQueue[i];
-            for (var j in pushData.clientUpdates) {
-                var update = pushData.clientUpdates[j];
-                if (update.clientSocketId !== game.connectionData.socketId) {
-                    objects.push.apply(objects, update.objects);
-                    projectiles.push.apply(projectiles, update.projectiles);
-                    soundsToTrigger.push.apply(soundsToTrigger, update.triggeredSounds);
-                }
-            }
+        updateObjects(data.objects);
+        updateProjectiles(data.projectiles);
+        updateImpacts(data.impacts);
+        updateObjectsToRemove(data.objectsToRemove);
 
-            impacts.push.apply(impacts, pushData.impacts);
-            objectsToRemove.push.apply(objectsToRemove, pushData.objectsToRemove);
-        }
-
-        updateObjects(objects);
-        updateProjectiles(projectiles);
-        updateImpacts(impacts);
-        updateObjectsToRemove(objectsToRemove);
-
-        playSounds(soundsToTrigger);
+        playSounds(data.soundsToTrigger);
     }
 
     function onPlayerDisconnected(data) {
