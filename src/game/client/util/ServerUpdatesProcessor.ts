@@ -13,13 +13,17 @@ namespace Crate {
             this._player = player;
         }
 
-        apply(data, projectiles) {
+        apply(data, projectiles): any {
             this.updateObjects(data.objects);
             this.updateProjectiles(data.projectiles, projectiles);
-            this.updateImpacts(data.impacts);
+            var playerDied = this.updateImpacts(data.impacts);
             this.updateObjectsToRemove(data.objectsToRemove);
 
             this.playSounds(data.soundsToTrigger);
+
+            return {
+                playerDied: playerDied
+            }
         }
 
         private updateObjects(data) {
@@ -69,9 +73,11 @@ namespace Crate {
             }
         }
 
-        private updateImpacts(data) {
+        // Returns "true" if the player has died, false if otherwise.
+        // TODO: extact a more meaningful representation of this event.
+        private updateImpacts(data): boolean {
             if (typeof data === 'undefined' || data.length === 0) {
-                return;
+                return false;
             }
 
             // filters out duplicates
@@ -125,10 +131,11 @@ namespace Crate {
             if (this._player.health <= 0) {
                 this._player.isAlive = false;
                 this._game.scene.remove(this._player.object);
-                this.sendPlayerDied(this._player);
+
+                return true;
             }
 
-            return;
+            return false;
         }
 
         private updateObjectsToRemove(networkUids) {
@@ -198,17 +205,6 @@ namespace Crate {
             }
 
             return true;
-        }
-
-        // todo: move out of here
-        sendPlayerDied(player:Player) {
-            this._game.emitNetworkData(
-                'playerDied',
-                {
-                    objectsToRemove: [
-                        player.object.networkUid
-                    ]
-                });
         }
     }
 }

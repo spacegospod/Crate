@@ -31,7 +31,7 @@ namespace Crate {
 
         // request spawn
         player.isAlive = false;
-        updatesProcessor.sendPlayerDied(player);
+        sendPlayerDied();
 
         attachListeners();
         attachNetworkHandlers();
@@ -218,6 +218,16 @@ namespace Crate {
         networkState.sendClientState(player);
     }
 
+    function sendPlayerDied() {
+        game.emitNetworkData(
+            'playerDied',
+            {
+                objectsToRemove: [
+                    player.object.networkUid
+                ]
+            });
+    }
+
     function onPlayerSpawned(data) {
         player.health = Player.MAX_HEALTH;
         player.isAlive = true;
@@ -233,7 +243,11 @@ namespace Crate {
 
     function applyServerPushData() {
         var data = networkState.getServerPushData(game.connectionData.socketId);
-        updatesProcessor.apply(data, projectiles);
+        var result = updatesProcessor.apply(data, projectiles);
+
+        if (result.playerDied) {
+            sendPlayerDied();
+        }
     }
 
     function onPlayerDisconnected(data) {
