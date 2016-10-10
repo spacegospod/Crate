@@ -3,12 +3,22 @@ namespace Crate {
     /*
         Contains all client state data and manages server updates.
     */
-    export class NetworkState {
+    export class NetworkStateController {
 
         private serverPushQueue;
 
-        constructor() {
+        private _game: Game;
+        private _networkPayloadBuilder: NetworkPayloadBuilder;
+
+        impacts = [];
+        triggeredSounds = [];
+        firedProjectiles: Projectile[] = [];
+
+        constructor(game:Game) {
             this.serverPushQueue = [];
+
+            this._game = game;
+            this._networkPayloadBuilder = new NetworkPayloadBuilder();
         }
 
         getServerPushData(socketId:string): any {
@@ -48,6 +58,28 @@ namespace Crate {
 
         clear() {
             this.serverPushQueue = [];
+            this.impacts = [];
+            this.triggeredSounds = [];
+            this.firedProjectiles = [];
+        }
+
+        sendClientState(player:Player) {
+            try {
+                var objects = [];
+                if (player.isAlive) {
+                    objects.push({object: player.object});
+                }
+
+                this._game.emitNetworkData('clientUpdate',
+                    this._networkPayloadBuilder.build(
+                        objects,
+                        this.firedProjectiles,
+                        this.impacts,
+                        this.triggeredSounds,
+                        this._game.connectionData.serverTimeOffset));
+            } catch(e) {
+                console.error(e || e.message);
+            }
         }
     }
 }

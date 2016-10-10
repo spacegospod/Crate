@@ -6,15 +6,10 @@ namespace Crate {
     var game: Game;
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
-    var impacts = [];
-    var triggeredSounds = [];
 
-    // All projectiles fired during the current frame
-    var firedProjectiles: Projectile[] = [];
-
-    var networkPayloadBuilder: NetworkPayloadBuilder = new NetworkPayloadBuilder();
     var inputController: InputController;
-    var networkState: NetworkState;
+    var networkState: NetworkStateController;
+    var updatesProcessor: ServerUpdatesProcessor;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -27,15 +22,16 @@ namespace Crate {
         viewPort = new ViewPort(canvas.width, canvas.height);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
 
+        player = new Player(new Soldier(new Point(0, 0), new Vector(1, 0)));
+
         inputController = new InputController(game.inputRegistry);
 
-        networkState = new NetworkState();
-
-        player = new Player(new Soldier(new Point(0, 0), new Vector(1, 0)));
+        networkState = new NetworkStateController(game);
+        updatesProcessor = new ServerUpdatesProcessor(game, player);
 
         // request spawn
         player.isAlive = false;
-        sendPlayerDied();
+        updatesProcessor.sendPlayerDied(player);
 
         attachListeners();
         attachNetworkHandlers();
@@ -90,7 +86,7 @@ namespace Crate {
                 if (typeof data === 'undefined') {
                     continue;
                 } else if (data.length > 0) {
-                    impacts.push({
+                    networkState.impacts.push({
                         projectile: projectile.object.networkUid,
                         object: object.networkUid,
                         damage: projectile.damage
@@ -105,7 +101,7 @@ namespace Crate {
 
                         game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
 
-                        triggeredSounds.push({
+                        networkState.triggeredSounds.push({
                             soundId: soundId,
                             origin: {
                                 x: object.position.x,
@@ -141,10 +137,6 @@ namespace Crate {
 
     function clearFrameState(environment) {
         networkState.clear();
-
-        firedProjectiles = [];
-        impacts = [];
-        triggeredSounds = [];
         // temporary
         player.health = Math.min(Player.MAX_HEALTH, player.health + (1 * environment.delta.getDelta()));
     }
@@ -169,7 +161,7 @@ namespace Crate {
 
                 game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
 
-                triggeredSounds.push({
+                networkState.triggeredSounds.push({
                     soundId: soundId,
                     origin: {
                         x: player.object.position.x,
@@ -190,8 +182,26 @@ namespace Crate {
                 && !(player.weapon.remainingAmmo === 0)) {
             player.weapon.reload();
             game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipOutSoundId, volume: 1});
+
+            networkState.triggeredSounds.push({
+                    soundId: player.weapon.clipOutSoundId,
+                    origin: {
+                        x: player.object.position.x,
+                        y: player.object.position.y
+                    },
+                    maxRange: 1000
+                });
+
             setTimeout(function() {
                 game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipInSoundId, volume: 1});
+                networkState.triggeredSounds.push({
+                    soundId: player.weapon.clipInSoundId,
+                    origin: {
+                        x: player.object.position.x,
+                        y: player.object.position.y
+                    },
+                    maxRange: 1000
+                });
             }, player.weapon.reloadTime - 200);
         }
     }
@@ -205,32 +215,7 @@ namespace Crate {
 
     /*------ Network functions ------*/
     function sendClientState() {
-        try {
-            var objects = [];
-            if (player.isAlive) {
-                objects.push({object: player.object});
-            }
-
-            game.emitNetworkData('clientUpdate',
-                networkPayloadBuilder.build(
-                    objects,
-                    firedProjectiles,
-                    impacts,
-                    triggeredSounds,
-                    game.connectionData.serverTimeOffset));
-        } catch(e) {
-            console.error(e || e.message);
-        }
-    }
-
-    function sendPlayerDied() {
-        game.emitNetworkData(
-            'playerDied',
-            {
-                objectsToRemove: [
-                    player.object.networkUid
-                ]
-            });
+        networkState.sendClientState(player);
     }
 
     function onPlayerSpawned(data) {
@@ -248,13 +233,7 @@ namespace Crate {
 
     function applyServerPushData() {
         var data = networkState.getServerPushData(game.connectionData.socketId);
-
-        updateObjects(data.objects);
-        updateProjectiles(data.projectiles);
-        updateImpacts(data.impacts);
-        updateObjectsToRemove(data.objectsToRemove);
-
-        playSounds(data.soundsToTrigger);
+        updatesProcessor.apply(data, projectiles);
     }
 
     function onPlayerDisconnected(data) {
@@ -269,174 +248,6 @@ namespace Crate {
                     }, 5000);
                 }
             }
-        }
-    }
-
-    function updateObjects(data) {
-        function updateObject(data) {
-            for (let i in game.scene.objects) {
-                var object = game.scene.objects[i];
-                if (object && object.networkUid != data.networkUid) {
-                    continue;
-                }
-
-                if (!(data.networkUid == player.object.networkUid)) {
-                    updateProperties(object, data);
-                }
-                return;
-            }
-
-            // object not found, create
-            var newobj = createObject(data);
-            if (typeof newobj !== 'undefined') {
-                game.scene.add(newobj);
-            }
-        }
-
-        for (let i in data) {
-            updateObject(data[i]);
-        }
-    }
-
-    function updateProjectiles(data) {
-        for (let i in data) {
-            var proj = data[i];
-            if (proj && isNetworkUIDUnique(proj.object.networkUid)) {
-                var bullet = new Projectile(
-                    new Point(proj.origin.x, proj.origin.y),
-                    new Vector(proj.direction.x, proj.direction.y),
-                    <number>proj.speed,
-                    proj.damage,
-                    createObject(proj.object),
-                    <number>proj.timestamp - game.connectionData.serverTimeOffset);
-                bullet.soundId = proj.soundId;
-                projectiles.push(bullet);
-                game.scene.add(bullet.object);
-                var distance:number = VU.length(VU.createVector(player.object.position, proj.origin));
-                var volume:number = (2500 - distance) / 2500;
-                game.triggerEvent(EVENTS.AUDIO, {soundId: bullet.soundId, volume: volume});
-            }
-        }
-    }
-
-    function updateImpacts(data) {
-        if (typeof data === 'undefined' || data.length === 0) {
-            return;
-        }
-
-        // filters out duplicates
-        function filterImpacts(impacts) {
-            var result = [];
-            for (var i = 0; i < impacts.length; i++) {
-                var isDuplicate = false;
-                var impact = impacts[i];
-                for (var j = i + 1; j < impacts.length; j++) {
-                    if (impact.object === impacts[j].object
-                        && impact.projectile === impacts[j].projectile) {
-                        isDuplicate = true;
-                    }
-                }
-
-                if (!isDuplicate) {
-                    result.push(impact);
-                }
-            }
-
-            return result;
-        }
-
-        var objectsByNetworkUid = {};
-        for (let i in game.scene.objects) {
-            let object:BasicObject = game.scene.objects[i];
-            objectsByNetworkUid[object.networkUid] = object;
-        }
-
-        var filteredImpacts = filterImpacts(data);
-
-        for (let i in filteredImpacts) {
-            let impact = filteredImpacts[i];
-            let object:BasicObject = objectsByNetworkUid[impact.object];
-
-            if (typeof object === 'undefined') {
-                continue;
-            }
-
-            if (object.gfx && object.gfx.blood.enabled) {
-                game.scene.add(new BloodStain(object.position));
-            }
-
-            if (typeof player.object !== 'undefined'
-                && impact.object === player.object.networkUid
-                && typeof impact.damage !== 'undefined') {
-                player.health -= impact.damage;
-            }
-        }
-
-        if (player.health <= 0) {
-            player.isAlive = false;
-            game.scene.remove(player.object);
-            sendPlayerDied();
-        }
-
-        return;
-    }
-
-    function updateObjectsToRemove(networkUids) {
-        var objectsToRemove = [];
-        for (var i in networkUids) {
-            var networkUid = networkUids[i];
-            for (var j in game.scene.objects) {
-                var object:BasicObject = game.scene.objects[j];
-                if (object.networkUid === networkUid) {
-                    objectsToRemove.push(object);
-                }
-            }
-        }
-
-        for (var i in objectsToRemove) {
-            game.scene.remove(objectsToRemove[i]);
-        }
-    }
-
-    function updateProperties(object:BasicObject, props) {
-        if (typeof props.position !== 'undefined') {
-            object.position = props.position;
-        }
-        if (typeof props.rotation !== 'undefined') {
-            object.rotation = props.rotation;
-        }
-        if (typeof props.collidable !== 'undefined') {
-            object.collidable = props.collidable;
-        }
-        if (typeof props.networkUid !== 'undefined') {
-            object.networkUid = props.networkUid;
-        }
-        if (typeof props.zIndex !== 'undefined') {
-            object.zIndex = props.zIndex;
-        }
-        if (typeof props.gfx !== 'undefined') {
-            object.gfx.motionBlur.enabled = props.gfx.motionBlur;
-            object.gfx.blood.enabled = props.gfx.blood;
-        }
-        if (props.imageKey && props.imageKey != object.imageKey) {
-            object.imageKey = props.imageKey;
-        }
-    }
-
-    function createObject(data):BasicObject {
-        var constructorFunction = Crate[data.type] || BasicObject;
-        var newObject = new constructorFunction();
-
-        updateProperties(newObject, data);
-        return newObject;
-    }
-
-    function playSounds(data) {
-        for (var i in data) {
-            var soundData = data[i];
-            var distance:number = VU.length(VU.createVector(player.object.position, soundData.origin));
-            var volume:number = (soundData.maxRange - distance) / soundData.maxRange;
-            game.triggerEvent(EVENTS.AUDIO, {soundId: soundData.soundId, volume: volume});
         }
     }
 
@@ -467,17 +278,7 @@ namespace Crate {
         game.triggerEvent(EVENTS.AUDIO, {soundId: projectile.soundId, volume: volume});
 
         projectiles.push(projectile);
-        firedProjectiles.push(projectile);
-    }
-
-    function isNetworkUIDUnique(uid:string) {
-        for (let i in game.scene.objects) {
-            if (game.scene.objects[i].networkUid === uid) {
-                return false;
-            }
-        }
-
-        return true;
+        networkState.firedProjectiles.push(projectile);
     }
 
     function registerCustomObjects(parser:LevelParser) {
