@@ -8,18 +8,21 @@ namespace Crate {
         private delta: Delta;
         private imageCache: ImageCache;
         private boundingBoxGenerator: BoundingBoxGenerator
+        private map: Map;
 
         detector: CollisionDetector;
         groupsResolver: CollisionGroupsResolver;
 
         constructor(delta:Delta,
                 imageCache:ImageCache,
-                boundingBoxGenerator:BoundingBoxGenerator) {
+                boundingBoxGenerator:BoundingBoxGenerator,
+                map:Map) {
             this.delta = delta;
             this.detector = new CollisionDetector();
             this.groupsResolver = new CollisionGroupsResolver();
             this.imageCache = imageCache;
             this.boundingBoxGenerator = boundingBoxGenerator;
+            this.map = map;
         }
 
         processDynamicObjects(scene:Scene) {
@@ -34,9 +37,13 @@ namespace Crate {
                 var motionVector:Vector = new Vector(
                     direction.x * (dynamicObject.speed * this.delta.getDelta()),
                     direction.y * (dynamicObject.speed * this.delta.getDelta()));
+
                 dynamicObject.position = new Point(
                     dynamicObject.position.x + motionVector.x,
                     dynamicObject.position.y + motionVector.y);
+
+                this.processTileBlocking(dynamicObject);
+
                 for (var j = 0; j < targets.length; j++) {
                     if (!dynamicObject.collidable || !targets[j].collidable) {
                         continue;
@@ -75,6 +82,48 @@ namespace Crate {
                     data.testedObject.position.y + motionVector.y);
             }
             data.testedObject.position = position;
+        }
+
+        private processTileBlocking(object:DynamicObject) {
+            if (!object.collidable || !object.boundingBox) {
+                return;
+            }
+
+            var boundingBox:BoundingBox = object.boundingBox;
+            var boxDiagonal = VU.length(VU.createVector(
+                boundingBox.vertices[0], boundingBox.vertices[2]));
+
+            var blockingLocations = [];
+
+            for (var i = object.position.x - boxDiagonal; i < object.position.x + boxDiagonal; i += Tile.TILE_WIDTH) {
+                for (var j = object.position.y - boxDiagonal; j < object.position.y + boxDiagonal; j += Tile.TILE_HEIGHT) {
+                    var tile:Tile = this.map.getTileByPosition(new Point(i, j));
+                    if (tile && tile.blocking) {
+                        blockingLocations.push({x: i, y: j});
+                    }
+                }
+            }
+
+            for (var k in blockingLocations) {
+                var location = blockingLocations[k];
+                var position:Point = new Point(
+                    (location.x - (location.x % Tile.TILE_WIDTH)) + (Tile.TILE_WIDTH / 2),
+                    (location.y - (location.y % Tile.TILE_HEIGHT)) + (Tile.TILE_HEIGHT / 2));
+
+                var boundingBox:BoundingBox = new BoundingBox(
+                    position,
+                    Tile.TILE_WIDTH,
+                    Tile.TILE_HEIGHT);
+                var dummyObject:BasicObject = new BasicObject();
+                dummyObject.boundingBox = boundingBox;
+                dummyObject.collidable = true;
+
+                var data:CollisionData = this.detector.getCollisionData(
+                        object, dummyObject);
+                if (data) {
+                    this.processCollision(data);
+                }
+            }
         }
 
         private updateBoundingBoxes(scene:Scene, imageCache:ImageCache) {

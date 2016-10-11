@@ -112,7 +112,7 @@ namespace Crate {
                 }
 
                 if (object.gfx && object.gfx.blood.enabled) {
-                    this._game.scene.add(new BloodStain(object.position));
+                    this._game.scene.add(new BloodStain(object.position, Math.random() * 360));
                 }
 
                 if (typeof this._player.object !== 'undefined'

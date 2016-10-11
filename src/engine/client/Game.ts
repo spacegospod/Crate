@@ -62,7 +62,8 @@ namespace Crate {
             this.boundingBoxGenerator = new BoundingBoxGenerator(boundingBoxes);
             this.physicsProcessor = new PhysicsProcessor(this.delta,
                 this.imageCache,
-                this.boundingBoxGenerator);
+                this.boundingBoxGenerator,
+                level.map);
             this.intersectionDetector = new IntersectionDetector();
             this.renderer = new Renderer(context, viewPort, this._scene, level.map, this.imageCache);
 

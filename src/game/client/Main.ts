@@ -282,7 +282,10 @@ namespace Crate {
 
         player.weapon.isFiring = true;
 
-        if (player.weapon.isReadyToFire() && !player.weapon.isReloading() && player.weapon.magazineAmmo > 0) {
+        if (player.isAlive
+            && player.weapon.isReadyToFire()
+            && !player.weapon.isReloading()
+            && player.weapon.magazineAmmo > 0) {
             var projectile:Projectile = player.weapon.fire(
                     player.projectileOrigin,
                     player.projectileDirection);

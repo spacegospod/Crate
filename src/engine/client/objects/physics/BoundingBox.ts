@@ -13,7 +13,7 @@ namespace Crate {
         // Offset from the position
         centerOffset: Vector = new Vector(0, 0);
 
-        vertices;
+        vertices: Point[];
 
         constructor(position:Point,
             width:number, height:number,
