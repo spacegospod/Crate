@@ -136,6 +136,10 @@ namespace Crate {
     }
 
     function clearFrameState(environment) {
+        if (!player.isAlive) {
+            sendPlayerDied();
+        }
+
         networkState.clear();
         // temporary
         player.health = Math.min(Player.MAX_HEALTH, player.health + (1 * environment.delta.getDelta()));
@@ -244,10 +248,6 @@ namespace Crate {
     function applyServerPushData() {
         var data = networkState.getServerPushData(game.connectionData.socketId);
         var result = updatesProcessor.apply(data, projectiles);
-
-        if (result.playerDied) {
-            sendPlayerDied();
-        }
     }
 
     function onPlayerDisconnected(data) {

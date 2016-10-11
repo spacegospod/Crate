@@ -28,14 +28,25 @@ namespace Crate {
             var objectsToRemove = [];
             var soundsToTrigger = [];
 
-            for (var i in this.serverPushQueue) {
+            // stores the IDs of objects which have updates.
+            // used for filtering out outdated update events.
+            var objectNetworkUids = [];
+
+            for (var i = this.serverPushQueue.length - 1; i >= 0; i--) {
                 var pushData = this.serverPushQueue[i];
                 for (var j in pushData.clientUpdates) {
                     var update = pushData.clientUpdates[j];
                     if (update.clientSocketId !== socketId) {
-                        objects.push.apply(objects, update.objects);
                         projectiles.push.apply(projectiles, update.projectiles);
                         soundsToTrigger.push.apply(soundsToTrigger, update.triggeredSounds);
+
+                        for (var k in update.objects) {
+                            var object = update.objects[k];
+                            if (objectNetworkUids.indexOf(object.networkUid) < 0) {
+                                objectNetworkUids.push(object.networkUid);
+                                objects.push(object);
+                            }
+                        }
                     }
                 }
 

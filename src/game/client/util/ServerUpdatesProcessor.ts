@@ -16,14 +16,10 @@ namespace Crate {
         apply(data, projectiles): any {
             this.updateObjects(data.objects);
             this.updateProjectiles(data.projectiles, projectiles);
-            var playerDied = this.updateImpacts(data.impacts);
+            this.updateImpacts(data.impacts);
             this.updateObjectsToRemove(data.objectsToRemove);
 
             this.playSounds(data.soundsToTrigger);
-
-            return {
-                playerDied: playerDied
-            }
         }
 
         private updateObjects(data) {
@@ -73,11 +69,9 @@ namespace Crate {
             }
         }
 
-        // Returns "true" if the player has died, false if otherwise.
-        // TODO: extact a more meaningful representation of this event.
-        private updateImpacts(data): boolean {
+        private updateImpacts(data): any {
             if (typeof data === 'undefined' || data.length === 0) {
-                return false;
+                return;
             }
 
             // filters out duplicates
@@ -132,10 +126,8 @@ namespace Crate {
                 this._player.isAlive = false;
                 this._game.scene.remove(this._player.object);
 
-                return true;
+                this._player.isAlive = false;
             }
-
-            return false;
         }
 
         private updateObjectsToRemove(networkUids) {
