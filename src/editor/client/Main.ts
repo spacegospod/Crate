@@ -195,9 +195,6 @@ namespace Editor {
 
     function selectObject() {
         var mousePosition = _game.inputRegistry.getMousePosition();
-        // correct for canvas offset on screen
-        mousePosition.x -= _canvas.getBoundingClientRect().left;
-        mousePosition.y -= _canvas.getBoundingClientRect().top;
 
         var godInViewport = _viewPort.translateInViewport(_god.position);
 

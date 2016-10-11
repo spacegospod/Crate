@@ -130,6 +130,14 @@ namespace Crate {
         context.fillText('AMMO: ' + Math.floor(player.weapon.magazineAmmo) + ' / ' + Math.floor(player.weapon.remainingAmmo),
             668, viewPort.height - 20);
 
+        if (player.weapon.isReloading()) {
+            context.fillStyle = '#dd3333';
+            context.globalAlpha = Math.abs(Math.sin( (Date.now() / 1500) * Math.PI ) );
+
+            var mousePosition:Point = game.inputRegistry.getMousePosition();
+            context.fillText('RELOADING', mousePosition.x - 43, mousePosition.y + 34);
+        }
+
         // reset globals
         context.fillStyle = originalFillStyle;
         context.globalAlpha = originalAlpha;

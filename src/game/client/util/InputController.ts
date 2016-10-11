@@ -52,11 +52,8 @@ namespace Crate {
         /**
          * Calculates the player's rotation based on mouse movement.
          */
-        processRotation(viewport, canvas, playerPosition:Point) {
+        processRotation(viewport, canvas, playerPosition:Point):number {
             var mousePosition = this._inputRegistry.getMousePosition();
-            // correct for canvas offset on screen
-            mousePosition.x -= canvas.getBoundingClientRect().left;
-            mousePosition.y -= canvas.getBoundingClientRect().top;
 
             var viewportPosition:Point = viewport.translateInViewport(playerPosition);
 

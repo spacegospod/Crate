@@ -43,7 +43,10 @@ namespace Crate {
         }
 
         getMousePosition() {
-            return new Point(this.mousePosition.x, this.mousePosition.y);
+            // correct for canvas offset on screen
+            return new Point(
+                this.mousePosition.x - this.canvas.getBoundingClientRect().left,
+                this.mousePosition.y - this.canvas.getBoundingClientRect().top);
         }
 
         private onMouseMove(event) {
