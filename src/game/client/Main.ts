@@ -12,6 +12,7 @@ namespace Crate {
     var updatesProcessor: ServerUpdatesProcessor;
 
     var isPlayerSpawning: boolean = false;
+    var frameBeginTime: number;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -40,6 +41,7 @@ namespace Crate {
         attachNetworkHandlers();
 
         game.begin([
+            prepareFrame,
             applyServerPushData,
             userInputCallback,
             processProjectiles], [
@@ -104,14 +106,8 @@ namespace Crate {
 
                         game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
 
-                        networkState.triggeredSounds.push({
-                            soundId: soundId,
-                            origin: {
-                                x: object.position.x,
-                                y: object.position.y
-                            },
-                            maxRange: 1000
-                        });
+                        networkState.triggeredSounds.push(
+                            createSoundNetworkEvent(soundId, object.position));
                     }
                     return;
                 }
@@ -144,6 +140,10 @@ namespace Crate {
         // reset globals
         context.fillStyle = originalFillStyle;
         context.globalAlpha = originalAlpha;
+    }
+
+    function prepareFrame(environment) {
+        frameBeginTime = Date.now();
     }
 
     function clearFrameState(environment) {
@@ -179,14 +179,8 @@ namespace Crate {
                 if (!game.inputRegistry.getKeyStatus(16)) {
                     game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
 
-                    networkState.triggeredSounds.push({
-                        soundId: soundId,
-                        origin: {
-                            x: player.object.position.x,
-                            y: player.object.position.y
-                        },
-                        maxRange: 1000
-                    });
+                    networkState.triggeredSounds.push(
+                        createSoundNetworkEvent(soundId, player.object.position));
                 }
                 
 
@@ -203,25 +197,13 @@ namespace Crate {
             player.weapon.reload();
             game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipOutSoundId, volume: 1});
 
-            networkState.triggeredSounds.push({
-                    soundId: player.weapon.clipOutSoundId,
-                    origin: {
-                        x: player.object.position.x,
-                        y: player.object.position.y
-                    },
-                    maxRange: 1000
-                });
+            networkState.triggeredSounds.push(
+                        createSoundNetworkEvent(player.weapon.clipOutSoundId, player.object.position));
 
             setTimeout(function() {
                 game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipInSoundId, volume: 1});
-                networkState.triggeredSounds.push({
-                    soundId: player.weapon.clipInSoundId,
-                    origin: {
-                        x: player.object.position.x,
-                        y: player.object.position.y
-                    },
-                    maxRange: 1000
-                });
+                networkState.triggeredSounds.push(
+                        createSoundNetworkEvent(player.weapon.clipInSoundId, player.object.position));
             }, player.weapon.reloadTime - 200);
         }
     }
@@ -352,5 +334,21 @@ namespace Crate {
         parser.registerCustomObject('Tree1', function(data) {
             return new Tree1();
         });
+    }
+
+    function createSoundNetworkEvent(soundid:string, origin:Point, maxRange=1000) {
+        var id = Math.floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+        return {
+            soundId: soundid,
+            origin: {
+                x: origin.x,
+                y: origin.y
+            },
+            maxRange: maxRange,
+            offset: Date.now() - frameBeginTime,
+            eventid: id
+        };
     }
 }

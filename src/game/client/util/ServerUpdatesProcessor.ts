@@ -185,7 +185,10 @@ namespace Crate {
                 var soundData = data[i];
                 var distance:number = VU.length(VU.createVector(this._player.object.position, soundData.origin));
                 var volume:number = (soundData.maxRange - distance) / soundData.maxRange;
-                this._game.triggerEvent(EVENTS.AUDIO, {soundId: soundData.soundId, volume: volume});
+
+                setTimeout( () => {
+                    this._game.triggerEvent(EVENTS.AUDIO, {soundId: soundData.soundId, volume: volume});
+                }, soundData.offset);
             }
         }
 

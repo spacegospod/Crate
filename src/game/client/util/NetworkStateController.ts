@@ -32,19 +32,30 @@ namespace Crate {
             // used for filtering out outdated update events.
             var objectNetworkUids = [];
 
+            // same as above
+            var soundEventIds = [];
+
             for (var i = this.serverPushQueue.length - 1; i >= 0; i--) {
                 var pushData = this.serverPushQueue[i];
                 for (var j in pushData.clientUpdates) {
                     var update = pushData.clientUpdates[j];
                     if (update.clientSocketId !== socketId) {
                         projectiles.push.apply(projectiles, update.projectiles);
-                        soundsToTrigger.push.apply(soundsToTrigger, update.triggeredSounds);
 
                         for (var k in update.objects) {
                             var object = update.objects[k];
                             if (objectNetworkUids.indexOf(object.networkUid) < 0) {
                                 objectNetworkUids.push(object.networkUid);
                                 objects.push(object);
+                            }
+                        }
+
+                        for (var m in update.triggeredSounds) {
+                            var sound = update.triggeredSounds[m];
+                            if (soundEventIds.indexOf(sound.eventid) < 0) {
+                                soundsToTrigger.push(sound);
+                                soundEventIds.push(sound.eventid);
+                                console.log(sound.eventid);
                             }
                         }
                     }
