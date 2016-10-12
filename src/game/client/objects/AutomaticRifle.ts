@@ -22,7 +22,7 @@ namespace Crate {
 
         constructor() {
             this.fireInterval = 100;
-            this.reloadTime = 5 * 1000;
+            this.reloadTime = 3 * 1000;
             this.magazineAmmo = 30;
             this.remainingAmmo = 90;
             this.damageMin = 9;

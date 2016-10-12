@@ -169,21 +169,26 @@ namespace Crate {
         var directionVectors = [];
         if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
             (<DynamicObject>player.object).direction = movementVector;
-            (<DynamicObject>player.object).speed = Soldier.SPEED;
+            (<DynamicObject>player.object).speed = game.inputRegistry.getKeyStatus(16)
+                ? Soldier.SPEED / 2
+                : Soldier.SPEED;
 
             if (player.object.sfx.onMove.sounds.length > 0 && player.object.sfx.onMove.isReady) {
                 var soundId = player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)];
 
-                game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
+                if (!game.inputRegistry.getKeyStatus(16)) {
+                    game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
 
-                networkState.triggeredSounds.push({
-                    soundId: soundId,
-                    origin: {
-                        x: player.object.position.x,
-                        y: player.object.position.y
-                    },
-                    maxRange: 1000
-                });
+                    networkState.triggeredSounds.push({
+                        soundId: soundId,
+                        origin: {
+                            x: player.object.position.x,
+                            y: player.object.position.y
+                        },
+                        maxRange: 1000
+                    });
+                }
+                
 
                 player.object.sfx.onMove.isReady = false;
                 setTimeout(function() {
@@ -249,8 +254,7 @@ namespace Crate {
         player.health = Player.MAX_HEALTH;
         player.isAlive = true;
 
-        player.weapon.remainingAmmo = 90;
-        player.weapon.magazineAmmo = 30;
+        player.weapon = new AutomaticRifle();
 
         game.scene.remove(player.object);
         player.object = new Soldier(new Point(data.location.x, data.location.y), new Vector(0, 1));
