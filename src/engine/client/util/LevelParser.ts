@@ -37,8 +37,8 @@ namespace Crate {
             try {
                 var map:Map = new Map(mapData.width, mapData.height);
 
-                if (mapData.textures) {
-                    map.applyTextures(mapData.textures);
+                if (mapData.tiles) {
+                    map.applyTileData(mapData.tiles);
                 }
 
                 return map;

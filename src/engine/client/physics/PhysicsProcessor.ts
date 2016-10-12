@@ -114,7 +114,9 @@ namespace Crate {
                     position,
                     Tile.TILE_WIDTH,
                     Tile.TILE_HEIGHT);
-                var dummyObject:BasicObject = new BasicObject();
+                var dummyObject:BasicObject = new BasicObject(
+                    'texture-default',
+                    position);
                 dummyObject.boundingBox = boundingBox;
                 dummyObject.collidable = true;
 

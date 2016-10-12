@@ -134,6 +134,12 @@ namespace Editor {
             // R
             selectObject();
             removeObject();
+        } else if (event.keyCode === 98) {
+            // B
+            setBlocking(true);
+        } else if (event.keyCode === 117) {
+            // U
+            setBlocking(false);
         }
     }
 
@@ -155,16 +161,19 @@ namespace Editor {
         outputLevel.mapData = {
             width: _level.map.columns,
             height: _level.map.rows,
-            textures: []
+            tiles: []
         };
 
         for (var i = 0; i < _level.map.rows; i++) {
-            outputLevel.mapData.textures.push([]);
+            outputLevel.mapData.tiles.push([]);
             for (var j = 0; j < _level.map.columns; j++) {
                 var tile = _level.map.getTileByIndex(j, i);
-                outputLevel.mapData.textures[i].push({
-                    x: tile.textureIndex.x,
-                    y: tile.textureIndex.y
+                outputLevel.mapData.tiles[i].push({
+                    textureIndex: {
+                        x: tile.textureIndex.x,
+                        y: tile.textureIndex.y
+                    },
+                    blocking: tile.blocking
                 });
             }
         }
@@ -213,6 +222,24 @@ namespace Editor {
                 _rotationInput.value = selectedObject.rotation;
                 return;
             }
+        }
+    }
+
+    function setBlocking(value) {
+        var mousePosition = _game.inputRegistry.getMousePosition();
+
+        var godInViewport = _viewPort.translateInViewport(_god.position);
+
+        var mapX = _god.position.x + (mousePosition.x - godInViewport.x);
+        var mapY = _god.position.y + (mousePosition.y - godInViewport.y);
+
+        var tile = _level.map.getTileByPosition({
+                x: mapX,
+                y: mapY
+            });
+
+        if (tile) {
+            tile.blocking = value;
         }
     }
 

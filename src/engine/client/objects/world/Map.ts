@@ -28,7 +28,8 @@ namespace Crate {
 
         // Retrieves a tile by its row and column indices
         getTileByIndex(row:number, column:number) {
-            if (row < 0 || column < 0) {
+            if (row < 0 || column < 0
+                || row >= this.rows || column >= this.columns) {
                 return undefined;
             }
 
@@ -43,15 +44,14 @@ namespace Crate {
             return this.getTileByIndex(row, col);
         }
 
-        // Iterates the provided two-dimensional array
-        // and applies textures to the corresponding tiles
-        applyTextures(textures) {
-            for (var i = 0; i < textures.length; i++) {
-                var row = textures[i];
+        applyTileData(tiles) {
+            for (var i = 0; i < tiles.length; i++) {
+                var row = tiles[i];
                 for (var j = 0; j < row.length; j++) {
-                    var tile = this.getTileByIndex(j, i);
+                    var tile:Tile = this.getTileByIndex(j, i);
                     if (typeof tile !== 'undefined') {
-                        tile.textureIndex = new Point(row[j].x, row[j].y);
+                        tile.textureIndex = new Point(row[j].textureIndex.x, row[j].textureIndex.y);
+                        tile.blocking = row[j].blocking;
                     }
                 }
             }

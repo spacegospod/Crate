@@ -40,10 +40,16 @@ namespace Crate {
             // this.context.clearRect(0, 0, this.viewPort.width, this.viewPort.height);
 
             // Fill with blank background color
+            this.context.fillStyle = '#333333';
             this.context.fillRect(0, 0, this.viewPort.width, this.viewPort.height);
 
             // Draw floor textures
             this.drawLevel();
+
+            // Debug code
+            if (params && params.indexOf('drawBlockingTiles') >= 0) {
+                this.drawBlockingTiles();
+            }
 
             // Get sorted objects, in order for drawing
             var objects = this.scene.getObjectsByZIndex();
@@ -72,32 +78,7 @@ namespace Crate {
                     // Debug code
                     if (params && params.indexOf('drawBoundingBoxes') >= 0) {
                         if (object.boundingBox !== undefined) {
-                            var a = object.boundingBox.vertices;
-                            var v = [];
-                            for (var i in a) {
-                                v.push(this.viewPort.translateInViewport(a[i]));
-                            }
-                            this.context.strokeStyle = "#33ff33";
-
-                            this.context.beginPath();
-                            this.context.moveTo(v[0].x, v[0].y);
-                            this.context.lineTo(v[1].x, v[1].y);
-                            this.context.stroke();
-
-                            this.context.beginPath();
-                            this.context.moveTo(v[1].x, v[1].y);
-                            this.context.lineTo(v[2].x, v[2].y);
-                            this.context.stroke();
-
-                            this.context.beginPath();
-                            this.context.moveTo(v[2].x, v[2].y);
-                            this.context.lineTo(v[3].x, v[3].y);
-                            this.context.stroke();
-
-                            this.context.beginPath();
-                            this.context.moveTo(v[3].x, v[3].y);
-                            this.context.lineTo(v[0].x, v[0].y);
-                            this.context.stroke();
+                            this.drawBoundingBox(object.boundingBox);
                         }
                     }
                 }
@@ -167,8 +148,8 @@ namespace Crate {
         }
 
         private drawLevel() {
-            for (var row=0; row < this.map.rows; row++) {
-                for (var col=0; col < this.map.columns; col++) {
+            for (var row = 0; row < this.map.rows; row++) {
+                for (var col = 0; col < this.map.columns; col++) {
                     if (this.testTile(row, col)) {
                         var tile = this.map.getTileByIndex(row, col);
                         var sprite = this.imageCache.getImageByKey("texture-sprite");
@@ -189,6 +170,65 @@ namespace Crate {
                     }
                 }
             }
+        }
+
+        private drawBlockingTiles() {
+            for (var row = 0; row < this.map.rows; row++) {
+                for (var col = 0; col < this.map.columns; col++) {
+                    if (this.testTile(row, col)) {
+                        var tile = this.map.getTileByIndex(row, col);
+                        if (!tile.blocking) {
+                            continue;
+                        }
+
+                        var sprite = this.imageCache.getImageByKey("texture-sprite");
+                        var location = this.viewPort.translateInViewport(
+                            new Point(
+                                row * Tile.TILE_WIDTH,
+                                col * Tile.TILE_HEIGHT));
+
+                        this.context.fillStyle = "#dd1111";
+                        this.context.globalAlpha = 0.5;
+
+                        this.context.fillRect(
+                            Math.floor(location.x),
+                            Math.floor(location.y),
+                            Tile.TILE_WIDTH,
+                            Tile.TILE_HEIGHT);
+                    }
+                }
+            }
+
+            this.context.globalAlpha = 1;
+        }
+
+        private drawBoundingBox(boundingBox:BoundingBox) {
+            var a = boundingBox.vertices;
+            var v = [];
+            for (var i in a) {
+                v.push(this.viewPort.translateInViewport(a[i]));
+            }
+            this.context.strokeStyle = "#33ff33";
+
+            this.context.beginPath();
+            this.context.moveTo(v[0].x, v[0].y);
+            this.context.lineTo(v[1].x, v[1].y);
+            this.context.stroke();
+
+            this.context.beginPath();
+            this.context.moveTo(v[1].x, v[1].y);
+            this.context.lineTo(v[2].x, v[2].y);
+            this.context.stroke();
+
+            this.context.beginPath();
+            this.context.moveTo(v[2].x, v[2].y);
+            this.context.lineTo(v[3].x, v[3].y);
+            this.context.stroke();
+
+            this.context.beginPath();
+            this.context.moveTo(v[3].x, v[3].y);
+            this.context.lineTo(v[0].x, v[0].y);
+            this.context.stroke();
         }
 
         private testTile(row:number, col:number) {
