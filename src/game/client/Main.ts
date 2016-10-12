@@ -11,6 +11,8 @@ namespace Crate {
     var networkState: NetworkStateController;
     var updatesProcessor: ServerUpdatesProcessor;
 
+    var isPlayerSpawning: boolean = false;
+
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
         game = new Game(canvas, io);
@@ -31,6 +33,7 @@ namespace Crate {
 
         // request spawn
         player.isAlive = false;
+        isPlayerSpawning = true;
         sendPlayerDied();
 
         attachListeners();
@@ -144,7 +147,7 @@ namespace Crate {
     }
 
     function clearFrameState(environment) {
-        if (!player.isAlive) {
+        if (!player.isAlive && !isPlayerSpawning) {
             sendPlayerDied();
         }
 
@@ -231,6 +234,7 @@ namespace Crate {
     }
 
     function sendPlayerDied() {
+        isPlayerSpawning = true;
         game.emitNetworkData(
             'playerDied',
             {
@@ -241,6 +245,7 @@ namespace Crate {
     }
 
     function onPlayerSpawned(data) {
+        isPlayerSpawning = false;
         player.health = Player.MAX_HEALTH;
         player.isAlive = true;
 
