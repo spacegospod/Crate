@@ -89,7 +89,7 @@ namespace Crate {
             try {
                 var objects = [];
                 if (player.isAlive) {
-                    objects.push({object: player.object});
+                    objects.push({object: player.object, deleteOnDisconnect: true});
                 }
 
                 this._game.emitNetworkData('clientUpdate',

@@ -25,6 +25,8 @@ var deadPlayersData = [];
 var clientsData = {};
 var registeredImpacts = [];
 
+var deleteOnDisconnect = {};
+
 function respawnDeadPlayers() {
     function respawnPlayer(socket) {
         var location = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
@@ -128,6 +130,23 @@ function buildPushData() {
                 });
 
                 clientUpdateItem.objects = filteredObjects;
+
+                for (var i in clientData.objects) {
+                    var object = clientData.objects[i];
+                    if (object.deleteOnDisconnect) {
+                        var present = false;
+                        for (var j in deleteOnDisconnect[socketId]) {
+                            var objToDeleteOnDisconnect = deleteOnDisconnect[socketId][j];
+                            if (objToDeleteOnDisconnect.networkUid === object.networkUid) {
+                                present = true;
+                            }
+                        }
+
+                        if (!present) {
+                            deleteOnDisconnect[socketId].push(object);
+                        }
+                    }
+                }
             }
 
             if (typeof clientData.projectiles !== 'undefined') {
@@ -143,6 +162,8 @@ function buildPushData() {
             data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
         } catch (e) {
             console.log(e);
+        } finally {
+            clientsData[socketId] = {};
         }
     }
 
@@ -158,7 +179,7 @@ function pushToClients() {
 
 function disconnectPlayer(socket) {
     try {
-        io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, clientsData[socket.id].objects);
+        io.emit(SERVER_PLAYER_DISCONNECTED_EVENT_ID, deleteOnDisconnect[socket.id]);
         console.log(socket.id + ' disconnected');
     } catch (e) {
         console.log('Failed to disconnect player');
@@ -168,6 +189,7 @@ function disconnectPlayer(socket) {
 
 io.sockets.on('connection', function(socket) {
     clientsData[socket.id] = {};
+    deleteOnDisconnect[socket.id] = [];
     console.log(socket.id + ' connected');
 
     socket.on('clientUpdate', function(data) {
