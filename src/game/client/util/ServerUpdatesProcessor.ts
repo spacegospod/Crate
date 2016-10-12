@@ -62,9 +62,6 @@ namespace Crate {
                     bullet.soundId = proj.soundId;
                     projectiles.push(bullet);
                     this._game.scene.add(bullet.object);
-                    var distance:number = VU.length(VU.createVector(this._player.object.position, proj.origin));
-                    var volume:number = (2500 - distance) / 2500;
-                    this._game.triggerEvent(EVENTS.AUDIO, {soundId: bullet.soundId, volume: volume});
                 }
             }
         }

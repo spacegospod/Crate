@@ -69,7 +69,7 @@ namespace Crate {
                 damage: projectile.damage,
                 timestamp: projectile.timestamp + timeOffset,
                 origin: {x: projectile.origin.x, y: projectile.origin.y},
-                object: this.buildObjectData(projectile.object),
+                object: this.buildObjectData({object: projectile.object}),
                 soundId: projectile.soundId
             }
         }

@@ -295,6 +295,9 @@ namespace Crate {
 
         projectiles.push(projectile);
         networkState.firedProjectiles.push(projectile);
+
+        networkState.triggeredSounds.push(
+            createSoundNetworkEvent(projectile.soundId, player.object.position));
     }
 
     function registerCustomObjects(parser:LevelParser) {
