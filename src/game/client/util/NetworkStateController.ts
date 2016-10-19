@@ -55,7 +55,6 @@ namespace Crate {
                             if (soundEventIds.indexOf(sound.eventid) < 0) {
                                 soundsToTrigger.push(sound);
                                 soundEventIds.push(sound.eventid);
-                                console.log(sound.eventid);
                             }
                         }
                     }
