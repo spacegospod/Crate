@@ -18,6 +18,7 @@ var spawnLocations = JSON.parse(
 // While this does not guarantee that updates will be provided for each and every
 // frame, it does provide frequent updates for accurate interpolation on the client side
 const SERVER_PUSH_TIMEOUT = 7;
+const PLAYER_SPAWN_TIME = 3 * 1000;
 const SERVER_PUST_EVENT_ID = "serverpush";
 const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
@@ -67,12 +68,13 @@ function respawnDeadPlayers() {
         socket.emit('spawnPlayer', {location: location});
     }
 
-    for (var deadPlayerInfo in deadPlayersData) {
-        var info = deadPlayersData[deadPlayerInfo];
-        respawnPlayer(info.socket);
+    for (var i in deadPlayersData) {
+        var info = deadPlayersData[i];
+        if ((Date.now() - info.timeOfDeath) >= PLAYER_SPAWN_TIME) {
+            respawnPlayer(info.socket);
+            delete deadPlayersData[i];
+        }
     }
-
-    deadPlayersData = [];
 }
 
 function disconnectPlayer(socket) {
@@ -88,6 +90,13 @@ function disconnectPlayer(socket) {
 io.sockets.on('connection', function(socket) {
     clientsData[socket.id] = {};
     deleteOnDisconnect[socket.id] = [];
+    // spawn immediately
+    deadPlayersData.push({
+            socket: socket,
+            data: [],
+            timeOfDeath: Date.now() - PLAYER_SPAWN_TIME
+        });
+
     console.log(socket.id + ' connected');
 
     socket.on('clientUpdate', function(data) {
@@ -98,7 +107,8 @@ io.sockets.on('connection', function(socket) {
     socket.on('playerDied', function(data) {
         deadPlayersData.push({
             socket: socket,
-            data: data.objectsToRemove
+            data: data.objectsToRemove,
+            timeOfDeath: Date.now()
         });
     });
     socket.on('disconnect', function() {

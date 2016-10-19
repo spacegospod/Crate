@@ -35,7 +35,6 @@ namespace Crate {
         // request spawn
         player.isAlive = false;
         isPlayerSpawning = true;
-        sendPlayerDied();
 
         attachListeners();
         attachNetworkHandlers();
@@ -125,17 +124,22 @@ namespace Crate {
         context.fillStyle = '#ffff00';
         context.globalAlpha = 0.7;
 
-        context.fillText('HEALTH: ' + Math.floor(player.health), 25, viewPort.height - 20);
-        context.fillText('AMMO: ' + Math.floor(player.weapon.magazineAmmo) + ' / ' + Math.floor(player.weapon.remainingAmmo),
-            668, viewPort.height - 20);
+        if (player.isAlive) {
+            context.fillText('HEALTH: ' + Math.floor(player.health), 25, viewPort.height - 20);
+            context.fillText('AMMO: ' + Math.floor(player.weapon.magazineAmmo) + ' / ' + Math.floor(player.weapon.remainingAmmo),
+                668, viewPort.height - 20);
 
-        if (player.weapon.isReloading()) {
-            context.fillStyle = '#dd3333';
-            context.globalAlpha = Math.abs(Math.sin( (Date.now() / 1500) * Math.PI ) );
+            if (player.weapon.isReloading()) {
+                context.fillStyle = '#dd3333';
+                context.globalAlpha = Math.abs(Math.sin( (Date.now() / 1500) * Math.PI ) );
 
-            var mousePosition:Point = game.inputRegistry.getMousePosition();
-            context.fillText('RELOADING', mousePosition.x - 43, mousePosition.y + 34);
+                var mousePosition:Point = game.inputRegistry.getMousePosition();
+                context.fillText('RELOADING', mousePosition.x - 43, mousePosition.y + 34);
+            }
+        } else {
+            context.fillText('DEAD', 25, viewPort.height - 20);
         }
+        
 
         // reset globals
         context.fillStyle = originalFillStyle;
@@ -164,6 +168,9 @@ namespace Crate {
     }
 
     function processKeys(environment) {
+        if (!player.isAlive) {
+            return;
+        }
         (<DynamicObject>player.object).speed = 0;
         var movementVector:Vector = inputController.processMovement();
         var directionVectors = [];
@@ -201,16 +208,19 @@ namespace Crate {
                         createSoundNetworkEvent(player.weapon.clipOutSoundId, player.object.position));
 
             setTimeout(function() {
-                game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipInSoundId, volume: 1});
-                networkState.triggeredSounds.push(
-                        createSoundNetworkEvent(player.weapon.clipInSoundId, player.object.position));
+                if (player.isAlive) {
+                    game.triggerEvent(EVENTS.AUDIO, {soundId: player.weapon.clipInSoundId, volume: 1});
+                    networkState.triggeredSounds.push(
+                            createSoundNetworkEvent(player.weapon.clipInSoundId, player.object.position));
+                }
             }, player.weapon.reloadTime - 200);
         }
     }
 
     function processMouse(environment) {
         player.object.rotation = inputController.processRotation(viewPort, _canvas, player.object.position);
-        if (inputController.isLeftMouseBtnPressed() && player.weapon.isReadyToFire && !player.weapon.isFiring) {
+        if (inputController.isLeftMouseBtnPressed() && player.isAlive
+            && player.weapon.isReadyToFire && !player.weapon.isFiring) {
             weaponFireHandler();
         }
     }
