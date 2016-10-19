@@ -4,7 +4,7 @@ const gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     jsonMinify = require('gulp-json-minify'),
     zip = require('gulp-zip'),
-    del = require('del');
+    del = require('del')
 
 /* ------ CLEANUP STEPS ------ */
 
@@ -75,7 +75,9 @@ gulp.task('engine-server', function() {
 // Builds the Crate game server and
 // publishes its uglified version to the build directory
 gulp.task('game-server', function() {
-    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
+    return gulp.src(['repo/engine-server.js',
+        'src/game/server/updatesProcessor.js',
+        'src/game/server/server.js'])
         .pipe(concat('server.js'))
         .pipe(uglify())
         .on('error', function(e) {
@@ -121,22 +123,12 @@ gulp.task('game-client-debug', function() {
         .pipe(gulp.dest('build/sources/'));
 });
 
-// Builds the Crate game server and
-// publishes its uglified version to the build directory
-gulp.task('game-server', function() {
-    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
-        .pipe(concat('server.js'))
-        .pipe(uglify())
-        .on('error', function(e) {
-            console.log(e);
-         })
-        .pipe(gulp.dest('build/sources/'));
-});
-
 // Builds the Crate game server in debug mode and
 // publishes it to the build directory
 gulp.task('game-server-debug', function() {
-    return gulp.src(['repo/engine-server.js', 'src/game/server/**/*.js'])
+    return gulp.src(['repo/engine-server.js',
+        'src/game/server/updatesProcessor.js',
+        'src/game/server/server.js'])
         .pipe(concat('server.js'))
         .pipe(gulp.dest('build/sources/'));
 });

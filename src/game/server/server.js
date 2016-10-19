@@ -14,9 +14,10 @@ var spawnLocations = JSON.parse(
 // The requestAnimationFrame method of the HTML5 canvas 2D context is capped
 // at 60 fps. Therefore the game itself is capped at 60 loops per second which
 // is roughly 40ms per cycle.
+
 // While this does not guarantee that updates will be provided for each and every
 // frame, it does provide frequent updates for accurate interpolation on the client side
-const SERVER_PUSH_TIMEOUT = 8;
+const SERVER_PUSH_TIMEOUT = 7;
 const SERVER_PUST_EVENT_ID = "serverpush";
 const SERVER_PLAYER_DISCONNECTED_EVENT_ID = "playerdisconnected";
 
@@ -26,20 +27,6 @@ var clientsData = {};
 var registeredImpacts = [];
 
 var deleteOnDisconnect = {};
-
-function respawnDeadPlayers() {
-    function respawnPlayer(socket) {
-        var location = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
-        socket.emit('spawnPlayer', {location: location});
-    }
-
-    for (var deadPlayerInfo in deadPlayersData) {
-        var info = deadPlayersData[deadPlayerInfo];
-        respawnPlayer(info.socket);
-    }
-
-    deadPlayersData = [];
-}
 
 function registerImpact(impact) {
     registeredImpacts.push({
@@ -61,120 +48,31 @@ function clearImpacts() {
     registeredImpacts = relevantImpacts;
 }
 
-// removes duplicate impact events
-function filterImpacts(impacts) {
-
-    function isImpactUnique(impact) {
-        for (var j in registeredImpacts) {
-            if (impact.object === registeredImpacts[j].data.object
-                && impact.projectile === registeredImpacts[j].data.projectile) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    var result = [];
-    for (var i in impacts) {
-        var impact = impacts[i];
-        if (isImpactUnique(impact)) {
-            result.push(impact);
-            registerImpact(impact);
-        }
-    }
-
-    return result;
-}
-
-function getObjectsToRemove() {
-    var objsToRemove = [];
-    for (var i in deadPlayersData) {
-        var info = deadPlayersData[i];
-        for (var j in info.data) {
-            try {
-                objsToRemove.push(info.data[j]);
-            } catch(e) {
-                console.log(e);
-            }
-        }
-    }
-
-    return objsToRemove;
-}
-
-function buildPushData() {
-    var data = {
-        impacts: [],
-        objectsToRemove: getObjectsToRemove(),
-        clientUpdates: []
-    };
-
-    for (var socketId in clientsData) {
-        var clientData = clientsData[socketId];
-        if (typeof clientData === 'undefined') {
-            continue;
-        }
-
-        try {
-            var clientUpdateItem = {
-                objects: [],
-                projectiles: [],
-                triggeredSounds: [],
-                clientSocketId: socketId
-            };
-
-            if (typeof clientData.objects !== 'undefined') {
-                var filteredObjects = clientData.objects.filter(function(object) {
-                    return data.objectsToRemove.indexOf(object.networkUid) < 0;
-                });
-
-                clientUpdateItem.objects = filteredObjects;
-
-                for (var i in clientData.objects) {
-                    var object = clientData.objects[i];
-                    if (object.deleteOnDisconnect) {
-                        var present = false;
-                        for (var j in deleteOnDisconnect[socketId]) {
-                            var objToDeleteOnDisconnect = deleteOnDisconnect[socketId][j];
-                            if (objToDeleteOnDisconnect.networkUid === object.networkUid) {
-                                present = true;
-                            }
-                        }
-
-                        if (!present) {
-                            deleteOnDisconnect[socketId].push(object);
-                        }
-                    }
-                }
-            }
-
-            if (typeof clientData.projectiles !== 'undefined') {
-                clientUpdateItem.projectiles = clientData.projectiles;
-            }
-
-            if (typeof clientData.triggeredSounds !== 'undefined') {
-                clientUpdateItem.triggeredSounds = clientData.triggeredSounds;
-            }
-
-            data.clientUpdates.push(clientUpdateItem);
-
-            data.impacts.push.apply(data.impacts, filterImpacts(clientData.impacts));
-        } catch (e) {
-            console.log(e);
-        } finally {
-            clientsData[socketId] = {};
-        }
-    }
-
-    return data;
-}
-
 function pushToClients() {
-    io.emit(SERVER_PUST_EVENT_ID, buildPushData());
+    io.emit(SERVER_PUST_EVENT_ID,
+        buildPushData(
+            clientsData,
+            registeredImpacts,
+            deleteOnDisconnect,
+            deadPlayersData));
+
     respawnDeadPlayers();
     clearImpacts();
     setTimeout(pushToClients, SERVER_PUSH_TIMEOUT);
+}
+
+function respawnDeadPlayers() {
+    function respawnPlayer(socket) {
+        var location = spawnLocations[Math.floor(Math.random() * spawnLocations.length)];
+        socket.emit('spawnPlayer', {location: location});
+    }
+
+    for (var deadPlayerInfo in deadPlayersData) {
+        var info = deadPlayersData[deadPlayerInfo];
+        respawnPlayer(info.socket);
+    }
+
+    deadPlayersData = [];
 }
 
 function disconnectPlayer(socket) {
