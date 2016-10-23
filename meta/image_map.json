@@ -1,5 +1,8 @@
 {
-    "blood": "blood.png",
+    "blood-1": "blood_1.png",
+    "blood-2": "blood_2.png",
+    "blood-3": "blood_3.png",
+    "blood-4": "blood_4.png",
     "bullet": "bullet.png",
     "crate-original": "crate_original.png",
     "soldier": "soldier.png",
@@ -14,5 +17,13 @@
     "plant-2": "plant_2.png",
     "plant-3": "plant_3.png",
     "tree-1": "tree_1.png",
-    "car-green": "car_green.png"
+    "car-green": "car_green.png",
+    "bone-1": "bone_1.png",
+    "bone-2": "bone_2.png",
+    "bone-3": "bone_3.png",
+    "bone-4": "bone_4.png",
+    "head": "head.png",
+    "hand": "hand.png",
+    "eye": "eye.png",
+    "guts": "guts.png"
 }

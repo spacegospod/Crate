@@ -14,12 +14,18 @@ namespace Crate {
         }
 
         apply(data, projectiles): any {
+            var result = {
+                playerDied: false
+            };
+
             this.updateObjects(data.objects);
             this.updateProjectiles(data.projectiles, projectiles);
-            this.updateImpacts(data.impacts);
+            result.playerDied = this.updateImpacts(data.impacts);
             this.updateObjectsToRemove(data.objectsToRemove);
 
             this.playSounds(data.soundsToTrigger);
+
+            return result;
         }
 
         private updateObjects(data) {
@@ -109,7 +115,10 @@ namespace Crate {
                 }
 
                 if (object.gfx && object.gfx.blood.enabled) {
-                    this._game.scene.add(new BloodStain(object.position, Math.random() * 360));
+                    var theta = 2 * Math.PI * Math.random();
+                    var x = object.position.x + (Math.random() * 20) * Math.cos(theta);
+                    var y = object.position.y + (Math.random() * 20) * Math.sin(theta);
+                    this._game.scene.add(new BloodStain(new Point(x, y), Math.random() * 360));
                 }
 
                 if (typeof this._player.object !== 'undefined'
@@ -119,12 +128,11 @@ namespace Crate {
                 }
             }
 
-            if (this._player.health <= 0) {
-                this._player.isAlive = false;
-                this._game.scene.remove(this._player.object);
-
-                this._player.isAlive = false;
+            if (this._player.health <= 0 && this._player.isAlive) {
+                return true;
             }
+
+            return false;
         }
 
         private updateObjectsToRemove(networkUids) {

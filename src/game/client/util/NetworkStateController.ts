@@ -84,11 +84,15 @@ namespace Crate {
             this.firedProjectiles = [];
         }
 
-        sendClientState(player:Player) {
+        sendClientState(player:Player, createdNetworkObjects:BasicObject[]) {
             try {
                 var objects = [];
                 if (player.isAlive) {
                     objects.push({object: player.object, deleteOnDisconnect: true});
+                }
+
+                for (var i in createdNetworkObjects) {
+                    objects.push({object: createdNetworkObjects[i], deleteOnDisconnect: false});
                 }
 
                 this._game.emitNetworkData('clientUpdate',

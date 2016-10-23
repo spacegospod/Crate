@@ -1482,8 +1482,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 2,
-                        "y": 1
+                        "x": 0,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2132,7 +2132,7 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
+                        "x": 1,
                         "y": 1
                     },
                     "blocking": false
@@ -2140,14 +2140,14 @@
                 {
                     "textureIndex": {
                         "x": 2,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 3,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2168,7 +2168,7 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2195,29 +2195,29 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 4,
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 5,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2316,8 +2316,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2359,21 +2359,21 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2421,29 +2421,29 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
@@ -2584,7 +2584,21 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
+                        "x": 1,
+                        "y": 1
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 7,
                         "y": 1
                     },
                     "blocking": false
@@ -2633,43 +2647,29 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 7,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -2718,7 +2718,7 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -3749,7 +3749,7 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
+                        "x": 7,
                         "y": 1
                     },
                     "blocking": false
@@ -4110,22 +4110,22 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 4,
+                        "y": 4
                     },
                     "blocking": false
                 },
@@ -4329,8 +4329,8 @@
             [
                 {
                     "textureIndex": {
-                        "x": 3,
-                        "y": 9
+                        "x": 7,
+                        "y": 6
                     },
                     "blocking": true
                 },
@@ -4350,8 +4350,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -4576,8 +4576,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -4689,14 +4689,14 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -4710,7 +4710,7 @@
                 {
                     "textureIndex": {
                         "x": 1,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -4802,36 +4802,36 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 5
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 4,
+                        "y": 4
                     },
                     "blocking": false
                 },
@@ -4901,7 +4901,7 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -4915,21 +4915,21 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 3,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -5056,8 +5056,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -5141,14 +5141,14 @@
                 {
                     "textureIndex": {
                         "x": 2,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 1,
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -5282,8 +5282,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -5388,7 +5388,7 @@
                 {
                     "textureIndex": {
                         "x": 0,
-                        "y": 1
+                        "y": 3
                     },
                     "blocking": false
                 },
@@ -5508,8 +5508,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -5734,8 +5734,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -5960,8 +5960,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 6,
+                        "y": 2
                     },
                     "blocking": false
                 },
@@ -6009,21 +6009,21 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
+                        "x": 1,
                         "y": 1
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 3
+                        "x": 1,
+                        "y": 1
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
+                        "x": 1,
                         "y": 1
                     },
                     "blocking": false
@@ -6144,8 +6144,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 5,
-                        "y": 9
+                        "x": 7,
+                        "y": 6
                     },
                     "blocking": true
                 },
@@ -6193,22 +6193,22 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 4,
+                        "y": 4
                     },
                     "blocking": false
                 },
@@ -6377,8 +6377,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 5,
-                        "y": 9
+                        "x": 7,
+                        "y": 6
                     },
                     "blocking": true
                 },
@@ -6433,148 +6433,148 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 3
-                    },
-                    "blocking": false
-                },
-                {
-                    "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 7,
+                        "y": 5
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
                         "x": 2,
-                        "y": 3
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
                 {
                     "textureIndex": {
-                        "x": 0,
-                        "y": 1
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
+                    },
+                    "blocking": false
+                },
+                {
+                    "textureIndex": {
+                        "x": 2,
+                        "y": 4
                     },
                     "blocking": false
                 },
@@ -6857,8 +6857,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 4,
-                        "y": 9
+                        "x": 7,
+                        "y": 6
                     },
                     "blocking": true
                 },
@@ -7244,8 +7244,8 @@
                 },
                 {
                     "textureIndex": {
-                        "x": 5,
-                        "y": 9
+                        "x": 7,
+                        "y": 6
                     },
                     "blocking": true
                 },
@@ -7268,6 +7268,32 @@
     },
     "objectsData": [
         {
+            "type": "CrateOriginal",
+            "properties": {
+                "imageKey": "crate-original",
+                "rotation": "34",
+                "position": {
+                    "x": 599.1327547818516,
+                    "y": 626.6825678792633
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CrateGreen",
+            "properties": {
+                "imageKey": "crate-green",
+                "rotation": -15,
+                "position": {
+                    "x": 700,
+                    "y": 100
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
             "type": "CrateGreen",
             "properties": {
                 "imageKey": "crate-green",
@@ -7281,13 +7307,26 @@
             }
         },
         {
+            "type": "CarGreen",
+            "properties": {
+                "imageKey": "car-green",
+                "rotation": "-44",
+                "position": {
+                    "x": 638.5150355111165,
+                    "y": 327.31503551111615
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
             "type": "CrateOriginal",
             "properties": {
                 "imageKey": "crate-original",
-                "rotation": 30,
+                "rotation": "66",
                 "position": {
-                    "x": 615,
-                    "y": 612
+                    "x": 812.8976033903797,
+                    "y": 792.7511970293647
                 },
                 "collidable": true,
                 "zIndex": 1
@@ -7301,6 +7340,32 @@
                 "position": {
                     "x": 780,
                     "y": 500
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CarGreen",
+            "properties": {
+                "imageKey": "car-green",
+                "rotation": "46",
+                "position": {
+                    "x": 168.669465966523,
+                    "y": 759.3234334106847
+                },
+                "collidable": true,
+                "zIndex": 1
+            }
+        },
+        {
+            "type": "CrateGreen",
+            "properties": {
+                "imageKey": "crate-green",
+                "rotation": "99",
+                "position": {
+                    "x": 198.45567081236038,
+                    "y": 99.22606025048202
                 },
                 "collidable": true,
                 "zIndex": 1
@@ -7333,68 +7398,42 @@
             }
         },
         {
-            "type": "CrateGreen",
+            "type": "Plant2",
             "properties": {
-                "imageKey": "crate-green",
-                "rotation": "99",
+                "imageKey": "plant-2",
+                "rotation": "55",
                 "position": {
-                    "x": 198.45567081236038,
-                    "y": 99.22606025048202
+                    "x": 681.4153523964708,
+                    "y": 281.335554932004
                 },
-                "collidable": true,
-                "zIndex": 1
+                "collidable": false,
+                "zIndex": 9
             }
         },
         {
-            "type": "CarGreen",
+            "type": "Plant1",
             "properties": {
-                "imageKey": "car-green",
-                "rotation": "-44",
+                "imageKey": "plant-1",
+                "rotation": "45",
                 "position": {
-                    "x": 638.5150355111165,
-                    "y": 327.31503551111615
+                    "x": 132.0236933762173,
+                    "y": 44.245396234237916
                 },
-                "collidable": true,
-                "zIndex": 1
+                "collidable": false,
+                "zIndex": 9
             }
         },
         {
-            "type": "CrateGreen",
+            "type": "Plant2",
             "properties": {
-                "imageKey": "crate-green",
-                "rotation": -15,
+                "imageKey": "plant-2",
+                "rotation": 0,
                 "position": {
-                    "x": 700,
-                    "y": 100
+                    "x": 635.4153523964708,
+                    "y": 297.335554932004
                 },
-                "collidable": true,
-                "zIndex": 1
-            }
-        },
-        {
-            "type": "CrateOriginal",
-            "properties": {
-                "imageKey": "crate-original",
-                "rotation": 63,
-                "position": {
-                    "x": 500,
-                    "y": 500
-                },
-                "collidable": true,
-                "zIndex": 1
-            }
-        },
-        {
-            "type": "CarGreen",
-            "properties": {
-                "imageKey": "car-green",
-                "rotation": "46",
-                "position": {
-                    "x": 168.669465966523,
-                    "y": 759.3234334106847
-                },
-                "collidable": true,
-                "zIndex": 1
+                "collidable": false,
+                "zIndex": 9
             }
         },
         {
@@ -7418,32 +7457,6 @@
                 "position": {
                     "x": 658.8078779685014,
                     "y": 486.06121164195406
-                },
-                "collidable": false,
-                "zIndex": 9
-            }
-        },
-        {
-            "type": "Plant1",
-            "properties": {
-                "imageKey": "plant-1",
-                "rotation": "33",
-                "position": {
-                    "x": 156.0236933762173,
-                    "y": 551.0453962342382
-                },
-                "collidable": false,
-                "zIndex": 9
-            }
-        },
-        {
-            "type": "Plant2",
-            "properties": {
-                "imageKey": "plant-2",
-                "rotation": "-9",
-                "position": {
-                    "x": 230.7150355111164,
-                    "y": 142.31503551111615
                 },
                 "collidable": false,
                 "zIndex": 9
@@ -7479,10 +7492,23 @@
             "type": "Plant1",
             "properties": {
                 "imageKey": "plant-1",
-                "rotation": "45",
+                "rotation": "33",
                 "position": {
-                    "x": 132.0236933762173,
-                    "y": 44.245396234237916
+                    "x": 156.0236933762173,
+                    "y": 551.0453962342382
+                },
+                "collidable": false,
+                "zIndex": 9
+            }
+        },
+        {
+            "type": "Plant2",
+            "properties": {
+                "imageKey": "plant-2",
+                "rotation": "-9",
+                "position": {
+                    "x": 230.7150355111164,
+                    "y": 142.31503551111615
                 },
                 "collidable": false,
                 "zIndex": 9
@@ -7499,6 +7525,45 @@
                 },
                 "collidable": false,
                 "zIndex": 101
+            }
+        },
+        {
+            "type": "Foliage1",
+            "properties": {
+                "imageKey": "foliage-1",
+                "rotation": "55",
+                "position": {
+                    "x": 181.73832534680122,
+                    "y": 722.834631460405
+                },
+                "collidable": false,
+                "zIndex": 101
+            }
+        },
+        {
+            "type": "Foliage1",
+            "properties": {
+                "imageKey": "foliage-1",
+                "rotation": 0,
+                "position": {
+                    "x": 770.1327547818516,
+                    "y": 778.6825678792633
+                },
+                "collidable": false,
+                "zIndex": 101
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": "66",
+                "position": {
+                    "x": 832.3040974269284,
+                    "y": 592.2001435749994
+                },
+                "collidable": false,
+                "zIndex": 102
             }
         },
         {
@@ -7531,10 +7596,10 @@
             "type": "Foliage3",
             "properties": {
                 "imageKey": "foliage-3",
-                "rotation": 0,
+                "rotation": "-22",
                 "position": {
-                    "x": 531.1178925810909,
-                    "y": 852.9863484208367
+                    "x": 747.4141689593391,
+                    "y": 804.1639820567507
                 },
                 "collidable": false,
                 "zIndex": 102
@@ -7544,10 +7609,23 @@
             "type": "Foliage3",
             "properties": {
                 "imageKey": "foliage-3",
-                "rotation": "66",
+                "rotation": "-35",
                 "position": {
-                    "x": 832.3040974269284,
-                    "y": 592.2001435749994
+                    "x": 662.4457997747711,
+                    "y": 625.3103017625876
+                },
+                "collidable": false,
+                "zIndex": 102
+            }
+        },
+        {
+            "type": "Foliage3",
+            "properties": {
+                "imageKey": "foliage-3",
+                "rotation": 0,
+                "position": {
+                    "x": 531.1178925810909,
+                    "y": 852.9863484208367
                 },
                 "collidable": false,
                 "zIndex": 102
@@ -7561,6 +7639,32 @@
                 "position": {
                     "x": 442.85128368454275,
                     "y": 899.2529573173848
+                },
+                "collidable": false,
+                "zIndex": 103
+            }
+        },
+        {
+            "type": "Foliage2",
+            "properties": {
+                "imageKey": "foliage-2",
+                "rotation": "33",
+                "position": {
+                    "x": 783.1327547818516,
+                    "y": 816.6825678792633
+                },
+                "collidable": false,
+                "zIndex": 103
+            }
+        },
+        {
+            "type": "Foliage2",
+            "properties": {
+                "imageKey": "foliage-2",
+                "rotation": "16",
+                "position": {
+                    "x": 295.409464946167,
+                    "y": 284.3409224512429
                 },
                 "collidable": false,
                 "zIndex": 103
