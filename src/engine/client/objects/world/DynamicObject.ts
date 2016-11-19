@@ -8,6 +8,11 @@ namespace Crate {
     export class DynamicObject extends BasicObject {
         // The speed at which the object moves at each loop
         speed: number;
+
+        // Whether the object rebounds on collision. If false the object
+        // will slide along the colliding surface.
+        rebound: boolean;
+
         // The movement direction
         protected _direction: Vector;
 
@@ -17,12 +22,14 @@ namespace Crate {
                 zIndex = 0,
                 collidable = false,
                 direction: Vector = new Vector(0, 1),
-                speed = 0) {
+                speed = 0,
+                rebound = false) {
             super(imageKey, position, rotation, zIndex, collidable);
             this.speed = speed;
             this.direction = (direction === undefined)
                     ? new Vector(0, 1)
                     : new Vector(direction.x, direction.y);
+            this.rebound = rebound;
         }
 
         set direction(value) {

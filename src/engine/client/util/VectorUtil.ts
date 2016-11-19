@@ -65,6 +65,16 @@ namespace Crate {
             return new Vector(v1.x + v2.x, v1.y + v2.y);
         }
 
+        // Get the substraction of 2 vectors
+        substractVectors(v1:Vector, v2:Vector):Vector {
+            return new Vector(v1.x - v2.x, v1.y - v2.y);
+        }
+
+        // Multiplies a vector by a given number
+        multiplyVector(v:Vector, n:number):Vector {
+            return new Vector(v.x * n, v.y * n);
+        }
+
         // Calculates the angle between two vectors
         findAngle(v1:Vector, v2:Vector):number {
             var cos = this.dotProduct(v1, v2) / (this.length(v1) * this.length(v2));

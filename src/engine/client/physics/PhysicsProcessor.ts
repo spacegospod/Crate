@@ -58,30 +58,53 @@ namespace Crate {
         }
 
         private processCollision(data:CollisionData) {
-            var distance:number = VU.length(VU.createVector(
-                data.testedObject.position, data.targetObject.position));
-            // attempt
-            var axis:Vector = data.axis;
-            var motionVector:Vector = new Vector(
-                axis.x * data.overlapAmount,
-                axis.y * data.overlapAmount);
-            var position:Point = new Point(
-                data.testedObject.position.x + motionVector.x,
-                data.testedObject.position.y + motionVector.y);
+            if (!(data.testedObject instanceof DynamicObject)) {
+                return;
+            }
 
-            if (VU.length(VU.createVector(
-                position, data.targetObject.position)) < distance) {
-                // flip axis if the objects got pushed together instead of apart
-                axis.x *= -1;
-                axis.y *= -1;
-                motionVector = new Vector(
+            let object:DynamicObject = <DynamicObject> data.testedObject;
+
+            let newPosition:Point;
+
+            if (object.rebound) {
+                // result = direction - 2 * (direction <dot> axis) * axis
+                let surfaceNormal:Vector = VU.normalize(data.axis);
+                let dot:number = VU.dotProduct(object.direction, surfaceNormal);
+                let substract:Vector = VU.multiplyVector(surfaceNormal, 2 * dot);
+                let motionVector:Vector = VU.substractVectors(
+                    object.direction,
+                    substract);
+                newPosition = new Point(
+                    object.position.x + motionVector.x,
+                    object.position.y + motionVector.y);
+                object.direction = motionVector;
+            } else {
+                let distance:number = VU.length(VU.createVector(
+                    object.position, data.targetObject.position));
+                // attempt
+                let axis:Vector = data.axis;
+                let motionVector:Vector = new Vector(
                     axis.x * data.overlapAmount,
                     axis.y * data.overlapAmount);
-                position = new Point(
-                    data.testedObject.position.x + motionVector.x,
-                    data.testedObject.position.y + motionVector.y);
+                newPosition = new Point(
+                    object.position.x + motionVector.x,
+                    object.position.y + motionVector.y);
+
+                if (VU.length(VU.createVector(
+                    newPosition, data.targetObject.position)) < distance) {
+                    // flip axis if the objects got pushed together instead of apart
+                    axis.x *= -1;
+                    axis.y *= -1;
+                    motionVector = new Vector(
+                        axis.x * data.overlapAmount,
+                        axis.y * data.overlapAmount);
+                    newPosition = new Point(
+                        object.position.x + motionVector.x,
+                        object.position.y + motionVector.y);
+                }
             }
-            data.testedObject.position = position;
+
+            data.testedObject.position = newPosition;
         }
 
         private processTileBlocking(object:DynamicObject) {

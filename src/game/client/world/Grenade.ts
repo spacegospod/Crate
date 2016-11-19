@@ -18,7 +18,8 @@ namespace Crate {
                 10,
                 true,
                 direction,
-                250);
+                250,
+                true);
             this._timerStart = Date.now();
             this._target = target;
             this.rotateInAir();
@@ -39,7 +40,7 @@ namespace Crate {
         }
 
         private rotateInAir() {
-            if (!this.exploded) {
+            if (!this.exploded && this.speed > 0) {
                 this.rotation += 11;
                 setTimeout(() => { this.rotateInAir(); }, 20);
             }

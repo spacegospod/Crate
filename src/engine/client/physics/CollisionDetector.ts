@@ -93,7 +93,7 @@ namespace Crate {
         private _overlapAmount: number;
 
         testedObject: BasicObject;
-        targetObject: BasicObject
+        targetObject: BasicObject;
 
         constructor(testedObject:BasicObject, targetObject:BasicObject,
             axis:Vector, overlap:number) {
