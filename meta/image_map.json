@@ -25,5 +25,7 @@
     "head": "head.png",
     "hand": "hand.png",
     "eye": "eye.png",
-    "guts": "guts.png"
+    "guts": "guts.png",
+    "explosion": "explosion.png",
+    "grenade": "grenade.png"
 }

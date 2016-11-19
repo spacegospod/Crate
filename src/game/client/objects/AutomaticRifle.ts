@@ -21,7 +21,7 @@ namespace Crate {
         private _maxRecoilAngle: number;
 
         constructor() {
-            this.fireInterval = 100;
+            this.fireInterval = 98;
             this.reloadTime = 2 * 1000;
             this.magazineAmmo = 30;
             this.remainingAmmo = 90;

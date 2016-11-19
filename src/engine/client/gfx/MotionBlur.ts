@@ -6,11 +6,11 @@ namespace Crate {
     export class MotionBlur implements IVisualEffect {
         enabled: boolean;
 
+        maxEvents: number = 8;
+
+        eventTTL: number = 100; //ms
+
         private _events: BlurData[];
-
-        static MAX_EVENTS: number = 8;
-
-        static EVENT_TTL: number = 100; //ms
 
         constructor(enabled:boolean) {
             this.enabled = enabled;
@@ -22,7 +22,7 @@ namespace Crate {
                 return;
             }
 
-            if (this._events.length > MotionBlur.MAX_EVENTS) {
+            if (this._events.length > this.maxEvents) {
                 this._events.shift();
             }
 
@@ -36,7 +36,7 @@ namespace Crate {
             var time = Date.now();
             for (let i in this._events) {
                 var event:BlurData = this._events[i];
-                if ((time - event.timestamp) < MotionBlur.EVENT_TTL) {
+                if ((time - event.timestamp) < this.eventTTL) {
                     events.push(event);
                 }
             }

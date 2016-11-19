@@ -70,7 +70,7 @@ namespace Crate {
             this.viewPort.detector = this.physicsProcessor.detector;
 
             for (var i in level.objects) {
-                this._scene.add(level.objects[i]);
+                this._scene.addObject(level.objects[i]);
             }
 
             this.initialized = true;

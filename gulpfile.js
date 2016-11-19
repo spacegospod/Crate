@@ -4,7 +4,8 @@ const gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     jsonMinify = require('gulp-json-minify'),
     zip = require('gulp-zip'),
-    del = require('del')
+    del = require('del'),
+    run = require('run-sequence');
 
 /* ------ CLEANUP STEPS ------ */
 
@@ -165,10 +166,20 @@ gulp.task('levels', function() {
         .pipe(gulp.dest('build/levels/'));
 });
 
+gulp.task('package', function() {
+    return gulp.src([
+        'build/sources/**/*',
+        'build/resources/images/**/*',
+        'build/resources/sounds/**/*',
+        'build/meta/**/*'
+    ], {base: './build'})
+    .pipe(zip('crate.zip'))
+    .pipe(gulp.dest('publish/'));
+});
+
 // Runs all tasks and packages the game
-gulp.task('install',
-    [
-        'engine-client',
+gulp.task('install', function() {
+        run('engine-client',
         'engine-server',
         'game-client',
         'game-server',
@@ -176,22 +187,13 @@ gulp.task('install',
         'resources-sounds',
         'meta',
         'levels',
-        'index'
-    ], function() {
-    return gulp.src([
-        'build/sources/',
-        'build/resources/images/',
-        'build/resources/sounds/',
-        'build/meta/'
-    ], {base: '.'})
-    .pipe(zip('crate.zip'))
-    .pipe(gulp.dest('publish/'));
-});
+        'index',
+        'package');
+    });
 
 // Runs all tasks in debug mode where aplicable and packages the game
-gulp.task('install-debug',
-    [
-        'engine-client',
+gulp.task('install-debug', function() {
+        run('engine-client',
         'engine-server',
         'game-client-debug',
         'game-server-debug',
@@ -199,14 +201,6 @@ gulp.task('install-debug',
         'resources-sounds',
         'meta',
         'levels',
-        'index'
-    ], function() {
-    return gulp.src([
-        'build/sources/',
-        'build/resources/images/',
-        'build/resources/sounds/',
-        'build/meta/'
-    ], {base: '.'})
-    .pipe(zip('crate.zip'))
-    .pipe(gulp.dest('publish/'));
-});
+        'index',
+        'package');
+    });

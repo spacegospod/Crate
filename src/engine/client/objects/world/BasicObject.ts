@@ -3,7 +3,7 @@ namespace Crate {
     /*
         A simple static map object
     */
-    export class BasicObject {
+    export class BasicObject implements IRenderable {
         // Objects with a higher Z index will be drawn "above" other objects.
         // This means that when 2 objects have to overlap, the one with the higher
         // index will be drawn on top

@@ -50,7 +50,7 @@ namespace Crate {
             // object not found, create
             var newobj = this.createObject(data);
             if (typeof newobj !== 'undefined') {
-                this._game.scene.add(newobj);
+                this._game.scene.addObject(newobj);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Crate {
                         <number>proj.timestamp - this._game.connectionData.serverTimeOffset);
                     bullet.soundId = proj.soundId;
                     projectiles.push(bullet);
-                    this._game.scene.add(bullet.object);
+                    this._game.scene.addObject(bullet.object);
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace Crate {
                     var theta = 2 * Math.PI * Math.random();
                     var x = object.position.x + (Math.random() * 20) * Math.cos(theta);
                     var y = object.position.y + (Math.random() * 20) * Math.sin(theta);
-                    this._game.scene.add(new BloodStain(new Point(x, y), Math.random() * 360));
+                    this._game.scene.addObject(new BloodStain(new Point(x, y), Math.random() * 360));
                 }
 
                 if (typeof this._player.object !== 'undefined'
@@ -148,7 +148,7 @@ namespace Crate {
             }
 
             for (var i in objectsToRemove) {
-                this._game.scene.remove(objectsToRemove[i]);
+                this._game.scene.removeObject(objectsToRemove[i]);
             }
         }
 

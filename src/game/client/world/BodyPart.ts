@@ -11,7 +11,7 @@ namespace Crate {
             super(imageKey,
                 position,
                 rotation,
-                2,
+                1,
                 false);
             setTimeout(() => {this.fadeHandler()}, BodyPart.FADE_INTERVAL);
         }

@@ -6,6 +6,7 @@ namespace Crate {
     var game: Game;
     var viewPort: ViewPort;
     var projectiles: Projectile[] = [];
+    var grenades: Grenade[] = [];
 
     var inputController: InputController;
     var networkState: NetworkStateController;
@@ -16,7 +17,10 @@ namespace Crate {
 
     var createdNetworkObjects:BasicObject[] = [];
 
-    const SOUND_FADE_DISTANCE: number = 700;
+    const SOUND_FADE_DISTANCE: number = 900;
+
+    // temporary
+    var canThrowGrenade: boolean = true;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
@@ -47,7 +51,8 @@ namespace Crate {
             prepareFrame,
             applyServerPushData,
             userInputCallback,
-            processProjectiles], [
+            processProjectiles,
+            processGrenades], [
             sendClientState,
             drawHud,
             clearFrameState]);
@@ -55,7 +60,11 @@ namespace Crate {
 
     function attachListeners() {
         addEventListener('objectExpired', (e: any) => {
-            game.scene.remove(e.detail.object);
+            game.scene.removeObject(e.detail.object);
+        });
+
+        addEventListener('animationExpired', (e: any) => {
+            game.scene.removeAnimation(e.detail.animation);
         });
     }
 
@@ -75,7 +84,7 @@ namespace Crate {
             var projectile:Projectile = projectiles[i];
             if (projectile.ttl <= 0) {
                 projectiles.splice(projectiles.indexOf(projectile), 1);
-                game.scene.remove(projectile.object);
+                game.scene.removeObject(projectile.object);
             } else {
                 // test against each collidable object
                 processProjectile(projectile, environment);
@@ -100,7 +109,7 @@ namespace Crate {
                         damage: projectile.damage
                     });
                     projectiles.splice(projectiles.indexOf(projectile), 1);
-                    game.scene.remove(projectile.object);
+                    game.scene.removeObject(projectile.object);
 
                     if (object.sfx.onHit.sounds.length > 0) {
                         var soundId = object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)];
@@ -117,6 +126,34 @@ namespace Crate {
             }
         }
         projectile.object.position = position;
+    }
+
+    function processGrenades(environment) {
+        let remainingGrenades: Grenade[] = [];
+        for (let i in grenades) {
+            let grenade:Grenade = grenades[i];
+            if (grenade.exploded) {
+                let explosionData: any = grenade.explosionData;
+
+                game.scene.removeObject(grenade);
+
+                let distance:number = VU.length(VU.createVector(player.object.position, grenade.position));
+                let volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
+                game.triggerEvent(EVENTS.AUDIO, {soundId: explosionData.soundid, volume: volume});
+
+                networkState.triggeredSounds.push(
+                    createSoundNetworkEvent(explosionData.soundid, grenade.position));
+
+                game.scene.addAnimation(explosionData.animation);
+            } else {
+                remainingGrenades.push(grenade);
+                if (grenade.isOnTarget) {
+                    grenade.speed = 0;
+                }
+            }
+        }
+
+        grenades = remainingGrenades;
     }
 
     function drawHud() {
@@ -220,6 +257,23 @@ namespace Crate {
                 }
             }, player.weapon.reloadTime - 200);
         }
+
+        if (inputController.isKeyPressed('G') && canThrowGrenade) {
+            canThrowGrenade = false;
+            setTimeout(() => { canThrowGrenade = true;}, 3000);
+
+            let playerInViewport:Point = viewPort.translateInViewport(player.object.position);
+            let mouseOffset:Point = new Point(
+                game.inputRegistry.getMousePosition().x - playerInViewport.x,
+                game.inputRegistry.getMousePosition().y - playerInViewport.y);
+            let target:Point = new Point(
+                player.object.position.x + mouseOffset.x,
+                player.object.position.y + mouseOffset.y);
+            let grenade:Grenade = new Grenade(player.projectileOrigin, player.projectileDirection, target);
+
+            grenades.push(grenade);
+            game.scene.addObject(grenade);
+        }
     }
 
     function processMouse(environment) {
@@ -253,9 +307,9 @@ namespace Crate {
 
         player.weapon = new AutomaticRifle();
 
-        game.scene.remove(player.object);
+        game.scene.removeObject(player.object);
         player.object = new Soldier(new Point(data.location.x, data.location.y), new Vector(0, 1));
-        game.scene.add(player.object);
+        game.scene.addObject(player.object);
         viewPort.centerOn(player.object);
     }
 
@@ -265,13 +319,13 @@ namespace Crate {
 
         if (result.playerDied) {
             player.isAlive = false;
-            game.scene.remove(player.object);
+            game.scene.removeObject(player.object);
             var bodyParts:BodyPart[] = createBodyParts();
 
             for (var i in bodyParts) {
                 var part:BodyPart = bodyParts[i];
                 createdNetworkObjects.push(part);
-                game.scene.add(part);
+                game.scene.addObject(part);
             }
 
             var soundId = 'die-' + Math.ceil(Math.random() * 5);
@@ -290,7 +344,7 @@ namespace Crate {
                     // The timeout is needed because the server might push some leftover updates
                     // and re-place the disconnected player on the scene
                     setTimeout(() => {
-                        game.scene.remove(objectToRemove);
+                        game.scene.removeObject(objectToRemove);
                     }, 5000);
                 }
             }
@@ -348,11 +402,11 @@ namespace Crate {
 
             fireProjectile(projectile);
         }
-        setTimeout(() => {weaponFireHandler();}, player.weapon.fireInterval);
+        setTimeout(() => { weaponFireHandler(); }, player.weapon.fireInterval);
     }
 
     function fireProjectile(projectile:Projectile) {
-        game.scene.add(projectile.object);
+        game.scene.addObject(projectile.object);
 
         var distance:number = VU.length(VU.createVector(player.object.position, projectile.origin));
         var volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;

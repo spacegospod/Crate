@@ -51,40 +51,83 @@ namespace Crate {
                 this.drawBlockingTiles();
             }
 
-            // Get sorted objects, in order for drawing
-            var objects = this.scene.getObjectsByZIndex();
+            // Get sorted items, in order for drawing
+            var items = this.scene.getAllByZIndex();
 
-            for (var i in objects) {
-                var object = objects[i];
-                // is the object within the viewport?
-                if (this.viewPort.testObject(object)) {
-                    var image = this.imageCache.getImageByKey(object.imageKey);
-                    if (typeof image === 'undefined') {
-                        console.error('Failed to render image for key: ' + object.imageKey);
-                        continue;
-                    }
+            for (var i in items) {
+                var item = items[i];
 
-                    var p = this.viewPort.translateInViewport(new Point(object.position.x, object.position.y));
-
-                    this.context.globalAlpha = object.opacity || 1;
-                    if (object.rotation == 0) {
-                        this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
+                if (item instanceof BasicObject) {
+                    this.drawObject(<BasicObject> item, params);
+                } else if (item instanceof Animation) {
+                    if ((<Animation> item).done) {
+                        this.scene.removeAnimation(item);
                     } else {
-                        this.drawRotated(image, p.x, p.y, object.rotation);
-                    }
-
-                    this.drawGfx(image, object);
-                    
-                    // Debug code
-                    if (params && params.indexOf('drawBoundingBoxes') >= 0) {
-                        if (object.boundingBox !== undefined) {
-                            this.drawBoundingBox(object.boundingBox);
-                        }
+                        this.drawAnimation(<Animation> item);
                     }
                 }
             }
 
             this.context.globalAlpha = 1;
+        }
+
+        private drawObject(object:BasicObject, params) {
+            // is the object within the viewport?
+            if (this.viewPort.testObject(object)) {
+                var image = this.imageCache.getImageByKey(object.imageKey);
+                if (typeof image === 'undefined') {
+                    console.error('Failed to render image for key: ' + object.imageKey);
+                    return;
+                }
+
+                var p:Point = this.viewPort.translateInViewport(new Point(object.position.x, object.position.y));
+
+                this.context.globalAlpha = object.opacity || 1;
+                if (object.rotation == 0) {
+                    this.context.drawImage(image, p.x - (image.width / 2), p.y- (image.height / 2));
+                } else {
+                    this.drawRotated(image, p.x, p.y, object.rotation);
+                }
+
+                this.drawGfx(image, object);
+                
+                // Debug code
+                if (params && params.indexOf('drawBoundingBoxes') >= 0) {
+                    if (object.boundingBox !== undefined) {
+                        this.drawBoundingBox(object.boundingBox);
+                    }
+                }
+            }
+        }
+
+        private drawAnimation(animation:Animation) {
+            var dummyObject:BasicObject = new BasicObject(null, animation.position);
+
+            if (this.viewPort.testObject(dummyObject)) {
+                var frame = animation.currentFrame;
+                if (frame) {
+                    var image = this.imageCache.getImageByKey(frame.sprite.imageKey);
+                    if (typeof image === 'undefined') {
+                        console.error('Failed to render image for key: ' + frame.sprite.imageKey);
+                        return;
+                    }
+
+                    var p:Point = this.viewPort.translateInViewport(new Point(animation.position.x, animation.position.y));
+
+                    this.context.globalAlpha = 1;
+
+                    this.context.drawImage(
+                            image,
+                            frame.x * frame.sprite.sectorWidth,
+                            frame.y * frame.sprite.sectorHeight,
+                            frame.sprite.sectorWidth,
+                            frame.sprite.sectorHeight,
+                            Math.floor(p.x),
+                            Math.floor(p.y),
+                            frame.sprite.sectorWidth,
+                            frame.sprite.sectorHeight);
+                }
+            }
         }
 
         private drawGfx(image, object:BasicObject) {

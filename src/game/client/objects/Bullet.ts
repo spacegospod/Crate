@@ -15,6 +15,7 @@ namespace Crate {
                     1,
                     false));
             this.object.gfx.motionBlur.enabled = true;
+            this.object.gfx.motionBlur.maxEvents = 12;
         }
     }
 }
