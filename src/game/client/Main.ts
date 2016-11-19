@@ -258,7 +258,7 @@ namespace Crate {
             }, player.weapon.reloadTime - 200);
         }
 
-        if (inputController.isKeyPressed('G') && canThrowGrenade && !player.weapon.isReloading) {
+        if (inputController.isKeyPressed('G') && canThrowGrenade && !player.weapon.isReloading()) {
             canThrowGrenade = false;
             setTimeout(() => { canThrowGrenade = true;}, 3000);
 

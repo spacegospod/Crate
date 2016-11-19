@@ -75,9 +75,13 @@ namespace Crate {
                     object.direction,
                     substract);
                 newPosition = new Point(
-                    object.position.x + motionVector.x,
-                    object.position.y + motionVector.y);
+                    object.position.x + motionVector.x * data.overlapAmount,
+                    object.position.y + motionVector.y * data.overlapAmount);
+
+                let reboundAngle:number = VU.findAngle(VU.rotateVector(object.direction, 180), motionVector);
                 object.direction = motionVector;
+
+                object.speed *= reboundAngle / 180;
             } else {
                 let distance:number = VU.length(VU.createVector(
                     object.position, data.targetObject.position));
