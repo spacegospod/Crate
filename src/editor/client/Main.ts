@@ -1,25 +1,25 @@
 ///<reference path='ObjectConstructorMapper.ts'/>
 namespace Editor {
     /*------ Main editor file ------*/
-    var _canvas: any;
-    var _context: any;
-    var _imageMap: any;
-    var _texturePicker: any;
-    var _objectSelector: any;
-    var _rotationInput: any;
-    var _level: Crate.Level;
-    var _game: Crate.Game;
+    let _canvas: any;
+    let _context: any;
+    let _imageMap: any;
+    let _texturePicker: any;
+    let _objectSelector: any;
+    let _rotationInput: any;
+    let _level: Crate.Level;
+    let _game: Crate.Game;
 
-    var _viewPort: Crate.ViewPort;
-    var _god: Crate.DynamicObject;
-    var _inputController: Crate.InputController;
+    let _viewPort: Crate.ViewPort;
+    let _god: Crate.DynamicObject;
+    let _inputController: Crate.InputController;
 
-    var _textureIndex: Crate.Point = new Crate.Point(0, 0);
-    var _imageCache: Crate.ImageCache;
+    let _textureIndex: Crate.Point = new Crate.Point(0, 0);
+    let _imageCache: Crate.ImageCache;
 
-    var mode = 'texture';
+    let mode = 'texture';
 
-    var selectedObject: Crate.BasicObject;
+    let selectedObject: Crate.BasicObject;
 
     export function init(canvas, context, imageMap, level:Crate.Level, boundingBoxes, socketIo) {
         document.addEventListener('keypress', onKeyPress);
@@ -56,8 +56,8 @@ namespace Editor {
     }
 
     function initObjectSelector(imageMap) {
-        for (var key in imageMap) {
-            var option = document.createElement("option");
+        for (let key in imageMap) {
+            let option = document.createElement("option");
             option.text = key;
             option.value = imageMap[key];
             _objectSelector.add(option);
@@ -73,8 +73,8 @@ namespace Editor {
 
     function processKeys(environment) {
         _god.speed = 0;
-        var movementVector:Crate.Vector = _inputController.processMovement();
-        var directionVectors = [];
+        let movementVector:Crate.Vector = _inputController.processMovement();
+        let directionVectors = [];
         if (typeof movementVector !== 'undefined' && Crate.VU.length(movementVector) != 0) {
             _god.direction = movementVector;
             _god.speed = 800;
@@ -82,16 +82,16 @@ namespace Editor {
     }
 
     function onClick(event) {
-        var viewportX = event.x - _canvas.getBoundingClientRect().left;
-        var viewportY = event.y - _canvas.getBoundingClientRect().top;
+        let viewportX = event.x - _canvas.getBoundingClientRect().left;
+        let viewportY = event.y - _canvas.getBoundingClientRect().top;
 
-        var godInViewport = _viewPort.translateInViewport(_god.position);
+        let godInViewport = _viewPort.translateInViewport(_god.position);
 
-        var mapX = _god.position.x + (viewportX - godInViewport.x);
-        var mapY = _god.position.y + (viewportY - godInViewport.y);
+        let mapX = _god.position.x + (viewportX - godInViewport.x);
+        let mapY = _god.position.y + (viewportY - godInViewport.y);
 
         if (mode === 'texture') {
-            var tile = _level.map.getTileByPosition({
+            let tile = _level.map.getTileByPosition({
                 x: mapX,
                 y: mapY
             });
@@ -100,10 +100,10 @@ namespace Editor {
                 tile.textureIndex = _textureIndex;
             }
         } else if (mode === 'object') {
-            var option = _objectSelector[_objectSelector.selectedIndex];
+            let option = _objectSelector[_objectSelector.selectedIndex];
 
-            var clazz = getObjectClass(option.text);
-            var newObject:Crate.BasicObject = new clazz(new Crate.Point(mapX, mapY));
+            let clazz = getObjectClass(option.text);
+            let newObject:Crate.BasicObject = new clazz(new Crate.Point(mapX, mapY));
             _game.scene.add(newObject);
             selectedObject = newObject;
             _rotationInput.value = selectedObject.rotation;
@@ -111,8 +111,8 @@ namespace Editor {
     }
 
     function onTexturePickerClick(event) {
-        var pickerX = event.x - _texturePicker.getBoundingClientRect().left;
-        var pickerY = event.y - _texturePicker.getBoundingClientRect().top;
+        let pickerX = event.x - _texturePicker.getBoundingClientRect().left;
+        let pickerY = event.y - _texturePicker.getBoundingClientRect().top;
 
         _textureIndex = new Crate.Point(
             (pickerX - (pickerX % Crate.Tile.TILE_WIDTH)) / Crate.Tile.TILE_WIDTH,
@@ -144,8 +144,8 @@ namespace Editor {
     }
 
     function onObjectTypeSelected(e) {
-        var option = _objectSelector[_objectSelector.selectedIndex];
-        var image = _imageCache.getImageByKey(option.text);
+        let option = _objectSelector[_objectSelector.selectedIndex];
+        let image = _imageCache.getImageByKey(option.text);
         _canvas.style.cursor = `url(resources/images/${option.value}) ${image.width / 2} ${image.height / 2}, auto`;
         mode = 'object';
         _rotationInput.value = 0;
@@ -153,7 +153,7 @@ namespace Editor {
     }
 
     function saveLevel() {
-        var outputLevel: any = {};
+        let outputLevel: any = {};
 
         // still blank
         outputLevel.spawnLocationsData = [];
@@ -164,10 +164,10 @@ namespace Editor {
             tiles: []
         };
 
-        for (var i = 0; i < _level.map.rows; i++) {
+        for (let i = 0; i < _level.map.rows; i++) {
             outputLevel.mapData.tiles.push([]);
-            for (var j = 0; j < _level.map.columns; j++) {
-                var tile = _level.map.getTileByIndex(j, i);
+            for (let j = 0; j < _level.map.columns; j++) {
+                let tile = _level.map.getTileByIndex(j, i);
                 outputLevel.mapData.tiles[i].push({
                     textureIndex: {
                         x: tile.textureIndex.x,
@@ -180,9 +180,9 @@ namespace Editor {
 
         outputLevel.objectsData = [];
 
-        for (var i = 0; i < _game.scene.objects.length; i++) {
-            var object:Crate.BasicObject = _game.scene.objects[i];
-            var data = {
+        for (let i = 0; i < _game.scene.objects.length; i++) {
+            let object:Crate.BasicObject = _game.scene.objects[i];
+            let data = {
                 type: (<any>object.constructor).name,
                 properties: {
                     imageKey: object.imageKey,
@@ -203,18 +203,18 @@ namespace Editor {
     }
 
     function selectObject() {
-        var mousePosition = _game.inputRegistry.getMousePosition();
+        let mousePosition = _game.inputRegistry.getMousePosition();
 
-        var godInViewport = _viewPort.translateInViewport(_god.position);
+        let godInViewport = _viewPort.translateInViewport(_god.position);
 
-        var mapX = _god.position.x + (mousePosition.x - godInViewport.x);
-        var mapY = _god.position.y + (mousePosition.y - godInViewport.y);
+        let mapX = _god.position.x + (mousePosition.x - godInViewport.x);
+        let mapY = _god.position.y + (mousePosition.y - godInViewport.y);
 
-        var dummyObject:Crate.BasicObject = new Crate.BasicObject();
+        let dummyObject:Crate.BasicObject = new Crate.BasicObject();
         dummyObject.boundingBox = new Crate.BoundingBox(new Crate.Point(mapX, mapY), 1, 1);
 
-        for (var i = 0; i < _game.scene.objects.length; i++) {
-            var object:Crate.BasicObject = _game.scene.objects[i];
+        for (let i = 0; i < _game.scene.objects.length; i++) {
+            let object:Crate.BasicObject = _game.scene.objects[i];
             if (new Crate.CollisionDetector().getCollisionData(
                 object,
                 dummyObject)) {
@@ -226,14 +226,14 @@ namespace Editor {
     }
 
     function setBlocking(value) {
-        var mousePosition = _game.inputRegistry.getMousePosition();
+        let mousePosition = _game.inputRegistry.getMousePosition();
 
-        var godInViewport = _viewPort.translateInViewport(_god.position);
+        let godInViewport = _viewPort.translateInViewport(_god.position);
 
-        var mapX = _god.position.x + (mousePosition.x - godInViewport.x);
-        var mapY = _god.position.y + (mousePosition.y - godInViewport.y);
+        let mapX = _god.position.x + (mousePosition.x - godInViewport.x);
+        let mapY = _god.position.y + (mousePosition.y - godInViewport.y);
 
-        var tile = _level.map.getTileByPosition({
+        let tile = _level.map.getTileByPosition({
                 x: mapX,
                 y: mapY
             });

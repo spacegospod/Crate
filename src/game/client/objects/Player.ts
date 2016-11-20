@@ -7,10 +7,12 @@ namespace Crate {
     export class Player {
         // we asume that 0 is the minimum
         static MAX_HEALTH: number = 100;
+
         private _object: BasicObject;
         private _health: number;
 
         weapon: IWeapon;
+        grenadesLeft: number;
 
         isAlive: boolean = true;
 
@@ -18,6 +20,7 @@ namespace Crate {
             this._object = object;
             this._health = Player.MAX_HEALTH;
             this.weapon = new AutomaticRifle();
+            this.grenadesLeft = 2;
         }
 
         get object():BasicObject {
@@ -47,7 +50,7 @@ namespace Crate {
                 this._object.position.y + aimVector.y * 40);
         }
 
-       get projectileDirection():Vector {
+        get projectileDirection():Vector {
             return VU.rotateVector(new Vector(0, -1), -1 * this._object.rotation);
         }
     }

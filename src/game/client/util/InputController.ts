@@ -6,9 +6,11 @@ namespace Crate {
     */
     export class InputController {
         private _inputRegistry: Input;
+        private _supressedKeys: any;
 
         constructor(inputRegistry:Input) {
             this._inputRegistry = inputRegistry;
+            this._supressedKeys = {};
         }
 
         isLeftMouseBtnPressed():boolean {
@@ -19,7 +21,7 @@ namespace Crate {
          * Calculates the direction vector for player movement
          */
         processMovement():Vector {
-            var directionVectors = [];
+            let directionVectors = [];
 
             // A
             if (this._inputRegistry.getKeyStatus(65)) {
@@ -38,10 +40,10 @@ namespace Crate {
                 directionVectors.push(new Vector(0, 1));
             }
 
-            var direction:Vector = undefined;
+            let direction:Vector = undefined;
             if (directionVectors.length > 0) {
                 direction = directionVectors[0];
-                for (var i = 1; i < directionVectors.length; i++) {
+                for (let i = 1; i < directionVectors.length; i++) {
                     direction = VU.sumVectors(direction, directionVectors[i]);
                 }
             }
@@ -53,22 +55,27 @@ namespace Crate {
          * Calculates the player's rotation based on mouse movement.
          */
         processRotation(viewport, canvas, playerPosition:Point):number {
-            var mousePosition = this._inputRegistry.getMousePosition();
+            let mousePosition = this._inputRegistry.getMousePosition();
 
-            var viewportPosition:Point = viewport.translateInViewport(playerPosition);
+            let viewportPosition:Point = viewport.translateInViewport(playerPosition);
 
-            var directionVector:Vector = VU.createVector(mousePosition, viewportPosition);
+            let directionVector:Vector = VU.createVector(mousePosition, viewportPosition);
 
-            var angle = VU.findAngle(
+            let angle = VU.findAngle(
                 new Vector(0, 1),
                 directionVector);
 
             return directionVector.x > 0 ? 360 - angle : angle;
         }
 
-        isKeyPressed(key) {
-            var charCode = key.charCodeAt(0);
-            return this._inputRegistry.getKeyStatus(charCode);
+        isKeyPressed(key:string) {
+            let charCode = key.charCodeAt(0);
+            return !this._supressedKeys[key] && this._inputRegistry.getKeyStatus(charCode);
+        }
+
+        supressKey(key:string, duration:number) {
+            this._supressedKeys[key] = true;
+            setTimeout( () => { delete this._supressedKeys[key]; }, duration);
         }
     }
 }

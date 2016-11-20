@@ -1,34 +1,31 @@
 namespace Crate {
     /*------ Main game file ------*/
 
-    var _canvas;
-    var player: Player;
-    var game: Game;
-    var viewPort: ViewPort;
-    var projectiles: Projectile[] = [];
-    var grenades: Grenade[] = [];
+    let _canvas;
+    let player: Player;
+    let game: Game;
+    let viewPort: ViewPort;
+    let projectiles: Projectile[] = [];
+    let grenades: Grenade[] = [];
 
-    var inputController: InputController;
-    var networkState: NetworkStateController;
-    var updatesProcessor: ServerUpdatesProcessor;
+    let inputController: InputController;
+    let networkState: NetworkStateController;
+    let updatesProcessor: ServerUpdatesProcessor;
 
-    var isPlayerSpawning: boolean = false;
-    var frameBeginTime: number;
+    let isPlayerSpawning: boolean = false;
+    let frameBeginTime: number;
 
-    var createdNetworkObjects:BasicObject[] = [];
+    let createdNetworkObjects:BasicObject[] = [];
 
     const SOUND_FADE_DISTANCE: number = 900;
-
-    // temporary
-    var canThrowGrenade: boolean = true;
 
     export function loadGame(canvas, context, imageMap, soundMap, boundingBoxes, levelData, io) {
         _canvas = canvas;
         game = new Game(canvas, io);
-        var levelParser = new LevelParser();
+        let levelParser = new LevelParser();
         registerCustomObjects(levelParser);
         
-        var level = levelParser.parse(levelData);
+        let level = levelParser.parse(levelData);
 
         viewPort = new ViewPort(canvas.width, canvas.height);
         game.init(imageMap, soundMap, boundingBoxes, context, viewPort, level);
@@ -80,8 +77,8 @@ namespace Crate {
 
     function processProjectiles(environment) {
         // for each projectile
-        for (var i in projectiles) {
-            var projectile:Projectile = projectiles[i];
+        for (let i in projectiles) {
+            let projectile:Projectile = projectiles[i];
             if (projectile.ttl <= 0) {
                 projectiles.splice(projectiles.indexOf(projectile), 1);
                 game.scene.removeObject(projectile.object);
@@ -94,11 +91,11 @@ namespace Crate {
     }
 
     function processProjectile(projectile:Projectile, environment) {
-        var position:Point = projectile.getPosition(Date.now());
-        for (var j in game.scene.objects) {
-            var object:BasicObject = game.scene.objects[j];
+        let position:Point = projectile.getPosition(Date.now());
+        for (let j in game.scene.objects) {
+            let object:BasicObject = game.scene.objects[j];
             if (object.collidable && typeof object.boundingBox !== 'undefined') {
-                var data:Point[] = environment.collision.line.getIntersectionDataForProjectile(projectile, object.boundingBox, environment.delta);
+                let data:Point[] = environment.collision.line.getIntersectionDataForProjectile(projectile, object.boundingBox, environment.delta);
                 // We use 1 bounding box per object -> we cannot have more than two intersection points
                 if (typeof data === 'undefined') {
                     continue;
@@ -112,9 +109,9 @@ namespace Crate {
                     game.scene.removeObject(projectile.object);
 
                     if (object.sfx.onHit.sounds.length > 0) {
-                        var soundId = object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)];
-                        var distance:number = VU.length(VU.createVector(player.object.position, object.position));
-                        var volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
+                        let soundId = object.sfx.onHit.sounds[Math.floor(Math.random() * object.sfx.onHit.sounds.length)];
+                        let distance:number = VU.length(VU.createVector(player.object.position, object.position));
+                        let volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
 
                         game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: volume});
 
@@ -149,6 +146,7 @@ namespace Crate {
                 remainingGrenades.push(grenade);
                 if (grenade.isOnTarget) {
                     grenade.speed = 0;
+                    grenade.collidable = false;
                 }
             }
         }
@@ -157,10 +155,10 @@ namespace Crate {
     }
 
     function drawHud() {
-        var context = _canvas.getContext('2d');
+        let context = _canvas.getContext('2d');
 
-        var originalFillStyle = context.fillStyle;
-        var originalAlpha = context.globalAlpha;
+        let originalFillStyle = context.fillStyle;
+        let originalAlpha = context.globalAlpha;
         context.font = '20px Impact';
         context.fillStyle = '#ffff00';
         context.globalAlpha = 0.7;
@@ -174,7 +172,7 @@ namespace Crate {
                 context.fillStyle = '#dd3333';
                 context.globalAlpha = Math.abs(Math.sin( (Date.now() / SOUND_FADE_DISTANCE) * Math.PI ) );
 
-                var mousePosition:Point = game.inputRegistry.getMousePosition();
+                let mousePosition:Point = game.inputRegistry.getMousePosition();
                 context.fillText('RELOADING', mousePosition.x - 43, mousePosition.y + 34);
             }
         } else {
@@ -214,8 +212,8 @@ namespace Crate {
             return;
         }
         (<DynamicObject>player.object).speed = 0;
-        var movementVector:Vector = inputController.processMovement();
-        var directionVectors = [];
+        let movementVector:Vector = inputController.processMovement();
+        let directionVectors = [];
         if (typeof movementVector !== 'undefined' && VU.length(movementVector) != 0) {
             (<DynamicObject>player.object).direction = movementVector;
             (<DynamicObject>player.object).speed = game.inputRegistry.getKeyStatus(16)
@@ -223,7 +221,7 @@ namespace Crate {
                 : Soldier.SPEED;
 
             if (player.object.sfx.onMove.sounds.length > 0 && player.object.sfx.onMove.isReady) {
-                var soundId = player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)];
+                let soundId = player.object.sfx.onMove.sounds[Math.floor(Math.random() * player.object.sfx.onMove.sounds.length)];
 
                 if (!game.inputRegistry.getKeyStatus(16)) {
                     game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
@@ -258,10 +256,8 @@ namespace Crate {
             }, player.weapon.reloadTime - 200);
         }
 
-        if (inputController.isKeyPressed('G') && canThrowGrenade && !player.weapon.isReloading()) {
-            canThrowGrenade = false;
-            setTimeout(() => { canThrowGrenade = true;}, 3000);
-
+        if (inputController.isKeyPressed('G') && player.grenadesLeft > 0 && !player.weapon.isReloading()) {
+            inputController.supressKey('G', 3000);
             let playerInViewport:Point = viewPort.translateInViewport(player.object.position);
             let mouseOffset:Point = new Point(
                 game.inputRegistry.getMousePosition().x - playerInViewport.x,
@@ -314,21 +310,21 @@ namespace Crate {
     }
 
     function applyServerPushData() {
-        var data = networkState.getServerPushData(game.connectionData.socketId);
-        var result = updatesProcessor.apply(data, projectiles);
+        let data = networkState.getServerPushData(game.connectionData.socketId);
+        let result = updatesProcessor.apply(data, projectiles);
 
         if (result.playerDied) {
             player.isAlive = false;
             game.scene.removeObject(player.object);
-            var bodyParts:BodyPart[] = createBodyParts();
+            let bodyParts:BodyPart[] = createBodyParts();
 
-            for (var i in bodyParts) {
-                var part:BodyPart = bodyParts[i];
+            for (let i in bodyParts) {
+                let part:BodyPart = bodyParts[i];
                 createdNetworkObjects.push(part);
                 game.scene.addObject(part);
             }
 
-            var soundId = 'die-' + Math.ceil(Math.random() * 5);
+            let soundId = 'die-' + Math.ceil(Math.random() * 5);
             game.triggerEvent(EVENTS.AUDIO, {soundId: soundId, volume: 1});
 
             networkState.triggeredSounds.push(
@@ -340,7 +336,7 @@ namespace Crate {
         for (let i in data) {
             for (let j in game.scene.objects) {
                 if (data[i].networkUid === game.scene.objects[j].networkUid) {
-                    var objectToRemove:BasicObject = game.scene.objects[j];
+                    let objectToRemove:BasicObject = game.scene.objects[j];
                     // The timeout is needed because the server might push some leftover updates
                     // and re-place the disconnected player on the scene
                     setTimeout(() => {
@@ -353,9 +349,9 @@ namespace Crate {
 
     /*------ Misc functions ------*/
     function createBodyParts() {
-        var origin:Point = player.object.position;
+        let origin:Point = player.object.position;
 
-        var parts = [
+        let parts = [
             'head',
             'eye',
             'hand',
@@ -366,17 +362,17 @@ namespace Crate {
             'bone-4'
         ];
 
-        var maxDistance:number = 50;
+        let maxDistance:number = 50;
 
-        var result:BodyPart[] = [];
+        let result:BodyPart[] = [];
 
-        for (var i in parts) {
-            var theta = 2 * Math.PI * Math.random();
-            var x = origin.x + (Math.random() * maxDistance) * Math.cos(theta);
-            var y = origin.y + (Math.random() * maxDistance) * Math.sin(theta);
+        for (let i in parts) {
+            let theta = 2 * Math.PI * Math.random();
+            let x = origin.x + (Math.random() * maxDistance) * Math.cos(theta);
+            let y = origin.y + (Math.random() * maxDistance) * Math.sin(theta);
 
-            var position:Point = new Point(x, y);
-            var rotation:number = Math.random() * 180;
+            let position:Point = new Point(x, y);
+            let rotation:number = Math.random() * 180;
 
             result.push(new BodyPart(parts[i], position, rotation));
         }
@@ -396,7 +392,7 @@ namespace Crate {
             && player.weapon.isReadyToFire()
             && !player.weapon.isReloading()
             && player.weapon.magazineAmmo > 0) {
-            var projectile:Projectile = player.weapon.fire(
+            let projectile:Projectile = player.weapon.fire(
                     player.projectileOrigin,
                     player.projectileDirection);
 
@@ -408,8 +404,8 @@ namespace Crate {
     function fireProjectile(projectile:Projectile) {
         game.scene.addObject(projectile.object);
 
-        var distance:number = VU.length(VU.createVector(player.object.position, projectile.origin));
-        var volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
+        let distance:number = VU.length(VU.createVector(player.object.position, projectile.origin));
+        let volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
         game.triggerEvent(EVENTS.AUDIO, {soundId: projectile.soundId, volume: volume});
 
         projectiles.push(projectile);
@@ -459,7 +455,7 @@ namespace Crate {
     }
 
     function createSoundNetworkEvent(soundid:string, origin:Point, maxRange=1000) {
-        var id = Math.floor((1 + Math.random()) * 0x10000)
+        let id = Math.floor((1 + Math.random()) * 0x10000)
                     .toString(16)
                     .substring(1);
         return {
