@@ -6,7 +6,6 @@ namespace Crate {
     let game: Game;
     let viewPort: ViewPort;
     let projectiles: Projectile[] = [];
-    let grenades: Grenade[] = [];
 
     let inputController: InputController;
     let networkState: NetworkStateController;
@@ -126,32 +125,33 @@ namespace Crate {
     }
 
     function processGrenades(environment) {
-        let remainingGrenades: Grenade[] = [];
-        for (let i in grenades) {
-            let grenade:Grenade = grenades[i];
-            if (grenade.exploded) {
-                let explosionData: any = grenade.explosionData;
+        let grenadesToRemove: Grenade[] = [];
+        for (let i in game.scene.objects) {
+            if (game.scene.objects[i] instanceof Grenade) {
+                let grenade:Grenade = <Grenade> game.scene.objects[i];
+                if (grenade.exploded) {
+                    let explosionData: any = grenade.explosionData;
 
-                game.scene.removeObject(grenade);
+                    grenadesToRemove.push(grenade);
 
-                let distance:number = VU.length(VU.createVector(player.object.position, grenade.position));
-                let volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
-                game.triggerEvent(EVENTS.AUDIO, {soundId: explosionData.soundid, volume: volume});
+                    let distance:number = VU.length(VU.createVector(player.object.position, grenade.position));
+                    let volume:number = (SOUND_FADE_DISTANCE - distance) / SOUND_FADE_DISTANCE;
+                    game.triggerEvent(EVENTS.AUDIO, {soundId: explosionData.soundid, volume: volume});
 
-                networkState.triggeredSounds.push(
-                    createSoundNetworkEvent(explosionData.soundid, grenade.position));
+                    networkState.triggeredSounds.push(
+                        createSoundNetworkEvent(explosionData.soundid, grenade.position));
 
-                game.scene.addAnimation(explosionData.animation);
-            } else {
-                remainingGrenades.push(grenade);
-                if (grenade.isOnTarget) {
+                    game.scene.addAnimation(explosionData.animation);
+                } else if (grenade.isOnTarget) {
                     grenade.speed = 0;
                     grenade.collidable = false;
                 }
             }
         }
 
-        grenades = remainingGrenades;
+        for (let i in grenadesToRemove) {
+            game.scene.removeObject(grenadesToRemove[i]);
+        }
     }
 
     function drawHud() {
@@ -267,8 +267,8 @@ namespace Crate {
                 player.object.position.y + mouseOffset.y);
             let grenade:Grenade = new Grenade(player.projectileOrigin, player.projectileDirection, target);
 
-            grenades.push(grenade);
             game.scene.addObject(grenade);
+            createdNetworkObjects.push(grenade);
         }
     }
 

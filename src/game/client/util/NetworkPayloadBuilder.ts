@@ -5,6 +5,7 @@ namespace Crate {
         Constructs data objects representing the client's state.
     */
     export class NetworkPayloadBuilder {
+
         build(objects, projectiles:Projectile[], impacts, triggeredSounds, serverTimeOffset:number) {
             try {
                 var payload = {
@@ -16,7 +17,11 @@ namespace Crate {
 
                 for (let i in objects) {
                     if (typeof objects[i] !== 'undefined') {
-                        payload.objects.push(this.buildObjectData(objects[i]));
+                        let objectData:any = this.buildObjectData(objects[i]);
+                        if (objects[i].object instanceof Grenade) {
+                            new GrenadeSerializer().serializeCustomProperties(objectData, objects[i].object);
+                        }
+                        payload.objects.push(objectData);
                     }
                 }
 
@@ -72,6 +77,18 @@ namespace Crate {
                 object: this.buildObjectData({object: projectile.object}),
                 soundId: projectile.soundId
             }
+        }
+    }
+
+    interface ICustomSerializer {
+        serializeCustomProperties(data:any, object:any);
+    }
+
+    class GrenadeSerializer implements ICustomSerializer {
+        serializeCustomProperties(data:any, object:any) {
+            data.target = (<Grenade> object).target;
+            data.timerStart = (<Grenade> object).timerStart;
+            data.direction = (<Grenade> object).direction;
         }
     }
 }

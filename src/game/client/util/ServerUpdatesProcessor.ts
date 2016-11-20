@@ -7,14 +7,16 @@ namespace Crate {
 
         private _game: Game;
         private _player: Player;
+        private _objectFactory:ObjectFactory;
 
         constructor(game:Game, player:Player) {
             this._game = game;
             this._player = player;
+            this._objectFactory = new ObjectFactory();
         }
 
         apply(data, projectiles): any {
-            var result = {
+            let result = {
                 playerDied: false
             };
 
@@ -36,7 +38,7 @@ namespace Crate {
 
         private updateObject(data) {
             for (let i in this._game.scene.objects) {
-                var object = this._game.scene.objects[i];
+                let object = this._game.scene.objects[i];
                 if (object && object.networkUid != data.networkUid) {
                     continue;
                 }
@@ -48,7 +50,7 @@ namespace Crate {
             }
 
             // object not found, create
-            var newobj = this.createObject(data);
+            let newobj = this.createObject(data);
             if (typeof newobj !== 'undefined') {
                 this._game.scene.addObject(newobj);
             }
@@ -56,9 +58,9 @@ namespace Crate {
 
         private updateProjectiles(data, projectiles) {
             for (let i in data) {
-                var proj = data[i];
+                let proj = data[i];
                 if (proj && this.isNetworkUIDUnique(proj.object.networkUid)) {
-                    var bullet = new Projectile(
+                    let bullet = new Projectile(
                         new Point(proj.origin.x, proj.origin.y),
                         new Vector(proj.direction.x, proj.direction.y),
                         <number>proj.speed,
@@ -79,11 +81,11 @@ namespace Crate {
 
             // filters out duplicates
             function filterImpacts(impacts) {
-                var result = [];
-                for (var i = 0; i < impacts.length; i++) {
-                    var isDuplicate = false;
-                    var impact = impacts[i];
-                    for (var j = i + 1; j < impacts.length; j++) {
+                let result = [];
+                for (let i = 0; i < impacts.length; i++) {
+                    let isDuplicate = false;
+                    let impact = impacts[i];
+                    for (let j = i + 1; j < impacts.length; j++) {
                         if (impact.object === impacts[j].object
                             && impact.projectile === impacts[j].projectile) {
                             isDuplicate = true;
@@ -98,13 +100,13 @@ namespace Crate {
                 return result;
             }
 
-            var objectsByNetworkUid = {};
+            let objectsByNetworkUid = {};
             for (let i in this._game.scene.objects) {
                 let object:BasicObject = this._game.scene.objects[i];
                 objectsByNetworkUid[object.networkUid] = object;
             }
 
-            var filteredImpacts = filterImpacts(data);
+            let filteredImpacts = filterImpacts(data);
 
             for (let i in filteredImpacts) {
                 let impact = filteredImpacts[i];
@@ -115,9 +117,9 @@ namespace Crate {
                 }
 
                 if (object.gfx && object.gfx.blood.enabled) {
-                    var theta = 2 * Math.PI * Math.random();
-                    var x = object.position.x + (Math.random() * 20) * Math.cos(theta);
-                    var y = object.position.y + (Math.random() * 20) * Math.sin(theta);
+                    let theta = 2 * Math.PI * Math.random();
+                    let x = object.position.x + (Math.random() * 20) * Math.cos(theta);
+                    let y = object.position.y + (Math.random() * 20) * Math.sin(theta);
                     this._game.scene.addObject(new BloodStain(new Point(x, y), Math.random() * 360));
                 }
 
@@ -136,18 +138,18 @@ namespace Crate {
         }
 
         private updateObjectsToRemove(networkUids) {
-            var objectsToRemove = [];
-            for (var i in networkUids) {
-                var networkUid = networkUids[i];
-                for (var j in this._game.scene.objects) {
-                    var object:BasicObject = this._game.scene.objects[j];
+            let objectsToRemove = [];
+            for (let i in networkUids) {
+                let networkUid = networkUids[i];
+                for (let j in this._game.scene.objects) {
+                    let object:BasicObject = this._game.scene.objects[j];
                     if (object.networkUid === networkUid) {
                         objectsToRemove.push(object);
                     }
                 }
             }
 
-            for (var i in objectsToRemove) {
+            for (let i in objectsToRemove) {
                 this._game.scene.removeObject(objectsToRemove[i]);
             }
         }
@@ -178,18 +180,17 @@ namespace Crate {
         }
 
         private createObject(data):BasicObject {
-            var constructorFunction = Crate[data.type] || BasicObject;
-            var newObject = new constructorFunction();
+            let newObject:BasicObject = this._objectFactory.build(data)
 
             this.updateProperties(newObject, data);
             return newObject;
         }
 
         private playSounds(data) {
-            for (var i in data) {
-                var soundData = data[i];
-                var distance:number = VU.length(VU.createVector(this._player.object.position, soundData.origin));
-                var volume:number = (soundData.maxRange - distance) / soundData.maxRange;
+            for (let i in data) {
+                let soundData = data[i];
+                let distance:number = VU.length(VU.createVector(this._player.object.position, soundData.origin));
+                let volume:number = (soundData.maxRange - distance) / soundData.maxRange;
 
                 setTimeout( () => {
                     this._game.triggerEvent(EVENTS.AUDIO, {soundId: soundData.soundId, volume: volume});
@@ -205,6 +206,38 @@ namespace Crate {
             }
 
             return true;
+        }
+    }
+
+    class ObjectFactory {
+        private _customBuilders:any;
+
+        constructor() {
+            this._customBuilders = [];
+            this._customBuilders['Grenade'] = new GrenadeCustomBuilder();
+        }
+
+        build(data:any):BasicObject {
+            let customBuilder:ICustomBuilder = this._customBuilders[data.type];
+            if (customBuilder) {
+                return customBuilder.build(data);
+            } else {
+                let constructorFunction = Crate[data.type] || BasicObject;
+                return new constructorFunction();
+            }
+        }
+    }
+
+    interface ICustomBuilder {
+        build(data:any):BasicObject;
+    }
+
+    class GrenadeCustomBuilder {
+        build(data:any):BasicObject {
+            return new Grenade(data.position,
+                    data.direction,
+                    data.target,
+                    data.timerStart);
         }
     }
 }

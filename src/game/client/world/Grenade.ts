@@ -11,7 +11,8 @@ namespace Crate {
 
         constructor(position:Point,
                 direction:Vector,
-                target:Point) {
+                target:Point,
+                timerStart: number = Date.now()) {
             super('grenade',
                 position,
                 0,
@@ -20,7 +21,7 @@ namespace Crate {
                 direction,
                 250,
                 true);
-            this._timerStart = Date.now();
+            this._timerStart = timerStart;
             this._target = target;
             this.rotateInAir();
         }
@@ -37,6 +38,14 @@ namespace Crate {
 
         get isOnTarget():boolean {
             return VU.length(VU.createVector(this.position, this._target)) < 16;
+        }
+
+        get target():Point {
+            return new Point(this._target.x, this._target.y);
+        }
+
+        get timerStart():number {
+            return this._timerStart;
         }
 
         private rotateInAir() {
